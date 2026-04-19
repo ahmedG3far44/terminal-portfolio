@@ -1,0 +1,64 @@
+{
+  "nav": {
+    "back": "Back",
+    "home": "العربيه"
+  },
+  "header": {
+    "title": "Full Stack Developer",
+    "subtitle": "Building scalable applications with MERN stack. Passionate about clean code and elegant solutions.",
+    "availableForHire": "Available for hire"
+  },
+  "projects": {
+    "title": "Projects",
+    "viewAll": "View All",
+    "featured": "Featured",
+    "viewCode": "View Code",
+    "liveDemo": "Live Demo",
+    "tags": "Tags",
+    "techStack": "Tech Stack",
+    "tools": "Tools"
+  },
+  "skills": {
+    "title": "Skills"
+  },
+  "contact": {
+    "title": "Get In Touch",
+    "email": "Email",
+    "linkedin": "LinkedIn",
+    "github": "GitHub"
+  },
+  "admin": {
+    "login": "Login",
+    "password": "Password",
+    "loginButton": "Enter Admin",
+    "dashboard": "Admin Dashboard",
+    "projects": "Projects Management",
+    "skills": "Skills Management",
+    "personalInfo": "Personal Info",
+    "addProject": "Add Project",
+    "editProject": "Edit Project",
+    "deleteProject": "Delete Project",
+    "addSkill": "Add Skill",
+    "deleteSkill": "Delete Skill",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "confirmDelete": "Are you sure you want to delete this?",
+    "logout": "Logout",
+    "back": "← Back to Site"
+  },
+  "projectForm": {
+    "title": "Title",
+    "description": "Description",
+    "slug": "Slug",
+    "repoUrl": "Repository URL",
+    "liveDemoUrl": "Live Demo URL",
+    "tags": "Tags (comma separated)",
+    "techStack": "Tech Stack (comma separated)",
+    "tools": "Tools (comma separated)",
+    "coverImage": "Cover Image URL"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidUrl": "Invalid URL"
+  }
+}

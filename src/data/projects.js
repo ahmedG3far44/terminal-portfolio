@@ -1,0 +1,67 @@
+export const projects = [
+  {
+    id: '01',
+    slug: 'ecommerce-platform',
+    title: 'E-Commerce Platform',
+    description: 'Full-stack e-commerce solution with Stripe payments integration, user authentication, shopping cart, order management, and admin dashboard.',
+    repoUrl: 'https://github.com/example/ecommerce-platform',
+    liveDemoUrl: 'https://ecommerce-demo.example.com',
+    tags: ['Featured', 'Full-Stack'],
+    techStack: ['React', 'Node.js', 'Express', 'MongoDB'],
+    tools: ['Stripe API', 'JWT', 'Redis', 'Docker'],
+    coverImage: null,
+  },
+  {
+    id: '02',
+    slug: 'realtime-chat',
+    title: 'Real-time Chat',
+    description: 'WebSocket-powered messaging application with real-time chat, group conversations, file sharing, andTyping indicators.',
+    repoUrl: 'https://github.com/example/realtime-chat',
+    liveDemoUrl: 'https://chat-demo.example.com',
+    tags: ['Real-Time', 'Socket'],
+    techStack: ['React', 'Node.js', 'Socket.io'],
+    tools: ['WebSocket', 'MongoDB', 'AWS S3'],
+    coverImage: null,
+  },
+  {
+    id: '03',
+    slug: 'task-manager',
+    title: 'Task Manager',
+    description: 'Kanban board application with drag-and-drop task management, user authentication, team collaboration, and task automation.',
+    repoUrl: 'https://github.com/example/task-manager',
+    liveDemoUrl: 'https://task-demo.example.com',
+    tags: ['Productivity', 'SaaS'],
+    techStack: ['Next.js', 'TypeScript', 'PostgreSQL'],
+    tools: ['Prisma', 'NextAuth', 'Docker'],
+    coverImage: null,
+  },
+  {
+    id: '04',
+    slug: 'weather-app',
+    title: 'Weather App',
+    description: 'Live weather dashboard with data visualization, forecast predictions, and location-based alerts using OpenWeatherMap API.',
+    repoUrl: 'https://github.com/example/weather-app',
+    liveDemoUrl: 'https://weather-demo.example.com',
+    tags: ['API', 'Visualization'],
+    techStack: ['React', 'TypeScript', 'OpenWeatherMap API'],
+    tools: ['Recharts', 'Geolocation API'],
+    coverImage: null,
+  },
+]
+
+export const skills = [
+  'React',
+  'Node.js',
+  'MongoDB',
+  'Express',
+  'TypeScript',
+  'AWS',
+  'Docker',
+]
+
+export const personalInfo = {
+  name: 'Full Stack Developer',
+  title: 'Full Stack Developer',
+  bio: 'Building scalable applications with MERN stack. Passionate about clean code and elegant solutions.',
+  availableForHire: true,
+}

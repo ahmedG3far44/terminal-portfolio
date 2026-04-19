@@ -1,0 +1,64 @@
+{
+  "nav": {
+    "back": "رجوع",
+    "home": "English"
+  },
+  "header": {
+    "title": "مطور كامل",
+    "subtitle": "أقوم ببناء تطبيقات قابلة للتطوير باستخدام تقنية MERN. شغوف بالكود النظيف والحلول الأنيقة.",
+    "availableForHire": "متاح للتوظيف"
+  },
+  "projects": {
+    "title": "المشاريع",
+    "viewAll": "عرض الكل",
+    "featured": "مميز",
+    "viewCode": "عرض الكود",
+    "liveDemo": "عرض مباشر",
+    "tags": "الوسوم",
+    "techStack": "التقنيات",
+    "tools": "الأدوات"
+  },
+  "skills": {
+    "title": "المهارات"
+  },
+  "contact": {
+    "title": "تواصل معي",
+    "email": "البريد الإلكتروني",
+    "linkedin": "لينكد إن",
+    "github": "جيت هب"
+  },
+  "admin": {
+    "login": "تسجيل الدخول",
+    "password": "كلمة المرور",
+    "loginButton": "دخول للوحة التحكم",
+    "dashboard": "لوحة التحكم",
+    "projects": "إدارة المشاريع",
+    "skills": "إدارة المهارات",
+    "personalInfo": "المعلومات الشخصية",
+    "addProject": "إضافة مشروع",
+    "editProject": "تعديل المشروع",
+    "deleteProject": "حذف المشروع",
+    "addSkill": "إضافة مهارة",
+    "deleteSkill": "حذف مهارة",
+    "save": "حفظ التغييرات",
+    "cancel": "إلغاء",
+    "confirmDelete": "هل أنت متأكد من الحذف؟",
+    "logout": "تسجيل خروج",
+    "back": "← العودة للموقع"
+  },
+  "projectForm": {
+    "title": "العنوان",
+    "description": "الوصف",
+    "slug": "الرابط",
+    "repoUrl": "رابط المستودع",
+    "liveDemoUrl": "رابط العرض المباشر",
+    "tags": "الوسوم (مفصولة بفواصل)",
+    "techStack": "التقنيات (مفصولة بفواصل)",
+    "tools": "الأدوات (مفصولة بفواصل)",
+    "coverImage": "رابط صورة الغلاف"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "invalidUrl": "رابط غير صالح"
+  }
+}
