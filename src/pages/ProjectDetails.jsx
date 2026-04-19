@@ -362,8 +362,6 @@ function ProjectContent() {
             repoInfo.owner,
             repoInfo.repo,
           );
-          console.log("README content: ");
-          console.log(readmeContent);
           if (readmeContent === null) {
             setError("No README found");
           }

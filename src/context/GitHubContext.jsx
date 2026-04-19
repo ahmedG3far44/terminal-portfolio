@@ -204,7 +204,7 @@ export function GitHubProvider({ children, username, token }) {
       const reposData = await fetchRepos(username, token)
       setRepos(reposData)
     } catch (err) {
-      console.error('Failed to load repos:', err)
+      // Silent fail
     } finally {
       setRepoLoading(false)
     }

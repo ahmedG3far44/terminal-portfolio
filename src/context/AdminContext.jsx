@@ -71,40 +71,30 @@ async function fetchUserRepos() {
 
 async function fetchRepoReadme(owner, name) {
   try {
-    console.log("Fetching README from:", owner, name);
     const headers = {
-      Authorization: `Bearer ${GITHUB_TOKEN}`,
-      Accept: "application/vnd.github.v3+json",
-    };
+      'Authorization': `Bearer ${GITHUB_TOKEN}`,
+      'Accept': 'application/vnd.github.v3+json'
+    }
 
-    const url = `https://api.github.com/repos/${owner}/${name}/contents/README.md`;
-    console.log("Fetching from URL:", url);
-
+    const url = `https://api.github.com/repos/${owner}/${name}/contents/README.md`
+    
     const response = await fetch(url, {
-      method: "GET",
-      headers,
-    });
-
+      method: 'GET',
+      headers
+    })
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.log("Error response:", errorText);
-      return null;
+      return null
     }
 
-    const data = await response.json();
-    
+    const data = await response.json()
+
     if (data.content) {
-      const decoded = atob(data.content);
-      const text = new TextDecoder("utf-8").decode(
-        Uint8Array.from(decoded, (c) => c.charCodeAt(0)),
-      );
-      return text;
+      return atob(data.content)
     }
-    return null;
+    return null
   } catch (err) {
-    console.error("Error fetching README:", err);
-    return null;
+    return null
   }
 }
 
@@ -189,9 +179,7 @@ export function AdminProvider({ children }) {
     try {
       const repos = await fetchUserRepos();
       setGithubRepos(repos);
-    } catch (err) {
-      console.error("Failed to load repos:", err);
-    } finally {
+    } catch (err) {} finally {
       setLoadingRepos(false);
     }
   }, []);
