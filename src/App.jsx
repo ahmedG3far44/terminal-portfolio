@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Theme from './pages/Theme'
+import Theme from './pages/Home'
 import ProjectDetails from './pages/ProjectDetails'
 import AdminDashboard from './pages/AdminDashboard'
 

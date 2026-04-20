@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
@@ -14,6 +15,22 @@ function ThemeContent() {
   const { primary, rgb } = colors;
 
   const { projects, skills, personalInfo } = data;
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const containerStyle = {
+    width: "100%",
+    maxWidth: isMobile ? "100%" : "75%",
+    margin: "0 auto",
+    padding: isMobile ? "0 1rem" : "0 2rem",
+  };
 
   return (
     <div
@@ -44,10 +61,9 @@ function ThemeContent() {
 
       <header
         style={{
-          minHeight: "100vh",
           display: "flex",
           alignItems: "center",
-          padding: "4rem 2rem",
+          padding: "4rem 0",
           position: "relative",
         }}
       >
@@ -55,7 +71,7 @@ function ThemeContent() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          style={{ width: "100%" }}
+          style={containerStyle}
         >
           <motion.div
             initial={{ x: isRTL ? 50 : -50, opacity: 0 }}
@@ -146,11 +162,13 @@ function ThemeContent() {
       </header>
 
       <GitHubProvider username={import.meta.env.VITE_GITHUB_USERNAME} token={import.meta.env.VITE_GITHUB_TOKEN}>
-        <GitHubBoard />
+        <div style={containerStyle}>
+          <GitHubBoard />
+        </div>
       </GitHubProvider>
       <section
         style={{
-          padding: "4rem 2rem",
+          padding: "4rem 0",
           borderTop: `1px solid ${primary}30`,
           position: "relative",
         }}
@@ -160,6 +178,7 @@ function ThemeContent() {
           whileInView={{ x: 0, opacity: 1 }}
           viewport={{ once: true }}
           style={{
+            ...containerStyle,
             fontSize: "0.75rem",
             color: `rgba(${rgb}, 0.5)`,
             marginBottom: "2rem",
@@ -171,6 +190,7 @@ function ThemeContent() {
 
         <div
           style={{
+            ...containerStyle,
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
             gap: "1.5rem",

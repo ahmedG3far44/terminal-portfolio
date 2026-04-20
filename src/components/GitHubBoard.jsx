@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useGitHub } from '../context/GitHubContext'
 import { useTheme } from '../context/ThemeContext'
@@ -133,6 +134,22 @@ export default function GitHubBoard() {
   const { rgb, primary } = colors
   const { isRTL } = useLanguage()
 
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  const containerStyle = {
+    width: '100%',
+    maxWidth: isMobile ? '100%' : '75%',
+    margin: '0 auto',
+    padding: isMobile ? '0 1rem' : '0 2rem'
+  }
+
   if (loading) {
     return (
       <section style={{ 
@@ -144,10 +161,10 @@ export default function GitHubBoard() {
           initial={{ x: isRTL ? 50 : -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           style={{
+            ...containerStyle,
             fontSize: '0.75rem',
             color: `rgba(${rgb}, 0.5)`,
             marginBottom: '2rem',
-            marginLeft: '2rem',
             letterSpacing: '0.2em'
           }}
         >
@@ -179,10 +196,10 @@ export default function GitHubBoard() {
         width: '100%'
       }}>
         <div style={{
+          ...containerStyle,
           fontSize: '0.75rem',
           color: '#f85149',
-          marginBottom: '1rem',
-          marginLeft: '2rem'
+          marginBottom: '1rem'
         }}>
           {`> error: ${error}`}
         </div>
@@ -217,12 +234,7 @@ export default function GitHubBoard() {
       position: 'relative',
       width: '100%'
     }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: '0 2rem'
-      }}>
+<div >
         <motion.div
           initial={{ x: isRTL ? 50 : -50, opacity: 0 }}
           whileInView={{ x: 0, opacity: 1 }}
