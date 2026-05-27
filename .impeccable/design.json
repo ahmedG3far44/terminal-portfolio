@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-27T00:00:00.000Z",
+  "title": "Design System: Terminal Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "neutral-bg": { "role": "neutral", "displayName": "Deep Zinc Canvas", "canonical": "oklch(0.025 0.002 280)", "tonalRamp": ["oklch(0.02 0.001 280)", "oklch(0.04 0.002 280)", "oklch(0.06 0.003 280)", "oklch(0.09 0.003 280)", "oklch(0.12 0.004 280)", "oklch(0.18 0.005 280)", "oklch(0.25 0.006 280)", "oklch(0.35 0.007 280)"] },
+      "neutral-surface": { "role": "neutral", "displayName": "Zinc Surface", "canonical": "oklch(0.06 0.003 280)", "tonalRamp": ["oklch(0.04 0.002 280)", "oklch(0.06 0.003 280)", "oklch(0.08 0.003 280)", "oklch(0.11 0.004 280)", "oklch(0.14 0.004 280)", "oklch(0.20 0.005 280)", "oklch(0.27 0.006 280)", "oklch(0.37 0.007 280)"] },
+      "neutral-text": { "role": "neutral", "displayName": "Output White", "canonical": "oklch(0.96 0.002 280)", "tonalRamp": ["oklch(0.80 0.003 280)", "oklch(0.85 0.003 280)", "oklch(0.88 0.003 280)", "oklch(0.90 0.002 280)", "oklch(0.92 0.002 280)", "oklch(0.94 0.002 280)", "oklch(0.96 0.002 280)", "oklch(0.98 0.001 280)"] },
+      "accent": { "role": "primary", "displayName": "Dynamic Terminal Accent", "canonical": "oklch(0.62 0.18 145)", "tonalRamp": ["oklch(0.15 0.10 145)", "oklch(0.25 0.14 145)", "oklch(0.35 0.17 145)", "oklch(0.45 0.19 145)", "oklch(0.55 0.20 145)", "oklch(0.62 0.18 145)", "oklch(0.70 0.15 145)", "oklch(0.80 0.10 145)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Heading Display", "purpose": "Hero headlines. Single use per viewport." },
+      "body": { "displayName": "Body Text", "purpose": "Main content, descriptions, paragraphs." },
+      "mono": { "displayName": "Terminal Mono", "purpose": "Terminal output, code blocks, command inputs." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease-out-quart", "value": "cubic-bezier(0.25, 1, 0.5, 1)", "purpose": "Default easing for state transitions (hover, focus, border shifts)." },
+      { "name": "duration-fast", "value": "150ms", "purpose": "Hover and focus transitions." },
+      { "name": "duration-normal", "value": "300ms", "purpose": "Section entry animations, accordion expansion." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "\"Create My Portfolio\" and other primary CTAs. White on dark backgrounds.",
+      "html": "<button class=\"ds-btn-primary\">Create My Portfolio</button>",
+      "css": ".ds-btn-primary { background: #ffffff; color: #000000; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; cursor: pointer; transition: background 150ms cubic-bezier(0.25, 1, 0.5, 1); display: inline-flex; align-items: center; gap: 0.5rem; } .ds-btn-primary:hover { background: #e4e4e7; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ghost/secondary actions. Border-based with dark background.",
+      "html": "<button class=\"ds-btn-secondary\">View Demo Themes</button>",
+      "css": ".ds-btn-secondary { background: #141414; color: #d4d4d8; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: 1px solid #27272a; cursor: pointer; transition: all 150ms cubic-bezier(0.25, 1, 0.5, 1); display: inline-flex; align-items: center; gap: 0.5rem; } .ds-btn-secondary:hover { background: rgba(39, 39, 42, 0.8); color: #ffffff; }"
+    },
+    {
+      "name": "Terminal Card",
+      "kind": "card",
+      "refersTo": "card-default",
+      "description": "The terminal simulator widget. The hero element of the landing page.",
+      "html": "<div class=\"ds-card-terminal\"><div class=\"ds-term-titlebar\"><div class=\"ds-term-dots\"><span class=\"ds-dot-red\"></span><span class=\"ds-dot-amber\"></span><span class=\"ds-dot-green\"></span></div><div class=\"ds-term-label\">ahmed.portfolio.io</div><div class=\"ds-term-dots\"></div></div><div class=\"ds-term-body\"><div class=\"ds-term-line\"><span class=\"ds-term-prompt\">dev@portfolio.io ~$ </span><span class=\"ds-term-cmd\">help</span></div><div class=\"ds-term-output\">Available commands:</div></div></div>",
+      "css": ".ds-card-terminal { background: #09090b; border: 1px solid rgba(39, 39, 42, 0.8); border-radius: 1.25rem; overflow: hidden; font-family: 'JetBrains Mono', monospace; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); } .ds-term-titlebar { background: #141414; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(39, 39, 42, 0.8); } .ds-term-dots { display: flex; gap: 0.375rem; } .ds-dot-red { width: 0.75rem; height: 0.75rem; border-radius: 50%; background: rgba(244, 63, 94, 0.8); } .ds-dot-amber { width: 0.75rem; height: 0.75rem; border-radius: 50%; background: rgba(245, 158, 11, 0.85); } .ds-dot-green { width: 0.75rem; height: 0.75rem; border-radius: 50%; background: rgba(16, 185, 129, 0.8); } .ds-term-label { font-size: 0.75rem; color: #52525b; background: #09090b; padding: 0.25rem 0.75rem; border-radius: 0.25rem; } .ds-term-body { padding: 1.25rem; min-height: 200px; font-size: 0.875rem; } .ds-term-line { margin-bottom: 0.5rem; } .ds-term-prompt { color: #52525b; } .ds-term-cmd { color: #fafafa; } .ds-term-output { color: #d4d4d8; }"
+    },
+    {
+      "name": "Command Chip",
+      "kind": "chip",
+      "refersTo": "chip-default",
+      "description": "Quick-action command buttons inside the terminal widget.",
+      "html": "<button class=\"ds-chip-cmd\"><span class=\"ds-chip-play\">▶</span> help</button>",
+      "css": ".ds-chip-cmd { background: #09090b; color: #d4d4d8; font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; padding: 0.25rem 0.625rem; border-radius: 0.25rem; border: 1px solid #27272a; cursor: pointer; transition: all 150ms cubic-bezier(0.25, 1, 0.5, 1); display: inline-flex; align-items: center; gap: 0.25rem; } .ds-chip-cmd:hover { border-color: #3f3f46; } .ds-chip-play { font-size: 0.625rem; color: #52525b; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Terminal Console",
+    "overview": "A dark-first, developer-oriented visual system that treats the terminal emulator as both metaphor and layout engine. Surfaces are flat and deliberate — zinc-950 is the canvas, white text reads as command output, and accent colors (drawn dynamically from a MongoDB theme system) provide the only chromatic relief. Borders do the work of shadows. Every element earns its place through typographic hierarchy and generous whitespace, not decoration.\n\nThe system explicitly rejects SaaS landing-page cliches: no hero-metric grids, no gradient text, no glassmorphism, no icon-on-card templates. The terminal is not a costume — it's a design constraint that produces clarity.",
+    "keyCharacteristics": [
+      "Dark-by-default, driven by a scene sentence (developer on a dimly-lit desk at night, focused on craft)",
+      "Flat surfaces with border-based separation (no drop shadows)",
+      "Typography as the primary carrier of hierarchy (Inter for headings, JetBrains Mono for code/UI)",
+      "Dynamic accent colors from DB themes applied to borders, text highlights, and small UI elements",
+      "Bilingual (English/Arabic RTL) as a first-class layout concern"
+    ],
+    "rules": [
+      { "name": "The One-Accent Rule", "body": "The accent color covers ≤10% of any screen. Its rarity is deliberate — it draws attention to interactive elements only.", "section": "colors" },
+      { "name": "The One-Family Rule", "body": "Inter covers display, heading, and body. A single-family approach with weight contrast (400 vs. 800) creates stronger hierarchy than timid face-pairing. Mono is the only departure, justified by the terminal metaphor.", "section": "typography" },
+      { "name": "The Flat-At-Rest Rule", "body": "No shadows at rest. Hover states use border color shifts (zinc-850 → zinc-700), not elevation lifts.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use zinc-dominated backgrounds (950, 900) with white/zinc-100 text.",
+      "Do apply accent color sparingly — active tabs, borders on hover, terminal glow.",
+      "Do use JetBrains Mono for any element that looks or acts like a terminal.",
+      "Do keep cards flat with border-only separation and hover border shifts.",
+      "Do wrap every text section in 65–75ch max-width for readability.",
+      "Do vary spacing between sections (py-16, py-24, py-32) for rhythm.",
+      "Do use the terminal widget as the primary interactive showcase element."
+    ],
+    "donts": [
+      "Don't use hero-metric templates (big number, small label, supporting stat).",
+      "Don't apply gradient text (background-clip: text with gradient).",
+      "Don't use glassmorphism (backdrop-blur as decorative surface treatment).",
+      "Don't use side-stripe borders (>1px left/right border as accent on cards).",
+      "Don't use identical card grids with icon + heading + text repeated endlessly.",
+      "Don't default to editorial-typographic aesthetics on a developer tools brief.",
+      "Don't use AI-generated copy — avoid 'supercharge,' 'game-changing,' 'revolutionary.'",
+      "Don't use em dashes."
+    ]
+  }
+}
