@@ -1,34 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme, themeVariants } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { http } from '../services/http';
 import { Sun, Moon, Languages, Palette, Settings } from 'lucide-react';
 
-const COLORS = {
-  background: '#09090b',
-  foreground: '#fafafa',
-  card: '#18181b',
-  border: '#27272a',
-  muted: '#27272a',
-  mutedForeground: '#a1a1aa',
-};
-
-const themeColorsList = [
-  { slug: 'green', name: 'Neon Green', primary: '#39ff14' },
-  { slug: 'blue', name: 'Electric Blue', primary: '#3b82f6' },
-  { slug: 'purple', name: 'Vivid Purple', primary: '#a855f7' },
-  { slug: 'skyblue', name: 'Sky Blue', primary: '#0ea5e9' },
-  { slug: 'zinc', name: 'Zinc', primary: '#71717a' },
-  { slug: 'amber', name: 'Amber', primary: '#f59e0b' },
-  { slug: 'rose', name: 'Rose', primary: '#f43f5e' },
-  { slug: 'cyan', name: 'Cyan', primary: '#06b6d4' },
-  { slug: 'emerald', name: 'Emerald', primary: '#10b981' },
-  { slug: 'orange', name: 'Orange', primary: '#f97316' },
-];
-
 export default function Controls() {
-  const { variant, setVariant, themes } = useTheme();
+  const { variant, setVariant, themes, tokens, mode, toggleMode } = useTheme();
   const { lang, setLang, isRTL } = useLanguage();
   const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
@@ -51,7 +29,7 @@ export default function Controls() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const availableThemes = themes.length > 0 ? themes : themeColorsList;
+  const availableThemes = themes.length > 0 ? themes : themeVariants;
 
   return (
     <>
@@ -64,9 +42,9 @@ export default function Controls() {
           width: '44px',
           height: '44px',
           borderRadius: '12px',
-          background: COLORS.card,
-          border: `1px solid ${COLORS.border}`,
-          color: COLORS.foreground,
+          background: tokens.surface,
+          border: `1px solid ${tokens.borderBase}`,
+          color: tokens.fg,
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
@@ -87,8 +65,8 @@ export default function Controls() {
             bottom: '5rem',
             [isRTL ? 'left' : 'right']: '1.5rem',
             width: '260px',
-            background: COLORS.card,
-            border: `1px solid ${COLORS.border}`,
+            background: tokens.surface,
+            border: `1px solid ${tokens.borderBase}`,
             borderRadius: '12px',
             padding: '1.25rem',
             zIndex: 1000,
@@ -96,7 +74,7 @@ export default function Controls() {
           }}
         >
           <div style={{ marginBottom: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontSize: '0.8rem', color: COLORS.mutedForeground }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontSize: '0.8rem', color: tokens.textMuted }}>
               <Palette size={14} />
               Accent Color
             </div>
@@ -110,7 +88,7 @@ export default function Controls() {
                     height: '28px',
                     borderRadius: '8px',
                     background: theme.primary,
-                    border: variant === theme.slug ? '2px solid white' : '2px solid transparent',
+                    border: variant === theme.slug ? `2px solid ${tokens.fg}` : '2px solid transparent',
                     cursor: 'pointer',
                     transition: 'all 0.15s',
                     outline: 'none',
@@ -121,8 +99,35 @@ export default function Controls() {
             </div>
           </div>
 
+          <div style={{ marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontSize: '0.8rem', color: tokens.textMuted }}>
+              {mode === 'dark' ? <Moon size={14} /> : <Sun size={14} />}
+              Theme
+            </div>
+            <button
+              onClick={toggleMode}
+              style={{
+                width: '100%',
+                padding: '0.5rem',
+                borderRadius: '8px',
+                border: `1px solid ${tokens.borderBase}`,
+                background: 'transparent',
+                color: tokens.fg,
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              {mode === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+              {mode === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            </button>
+          </div>
+
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontSize: '0.8rem', color: COLORS.mutedForeground }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontSize: '0.8rem', color: tokens.textMuted }}>
               <Languages size={14} />
               Language
             </div>
@@ -133,9 +138,9 @@ export default function Controls() {
                   flex: 1,
                   padding: '0.5rem',
                   borderRadius: '8px',
-                  border: `1px solid ${lang === 'en' ? COLORS.foreground : COLORS.border}`,
-                  background: lang === 'en' ? COLORS.muted : 'transparent',
-                  color: COLORS.foreground,
+                  border: `1px solid ${lang === 'en' ? tokens.fg : tokens.borderBase}`,
+                  background: lang === 'en' ? tokens.borderBase : 'transparent',
+                  color: tokens.fg,
                   cursor: 'pointer',
                   fontSize: '0.8rem',
                   fontWeight: lang === 'en' ? 600 : 400,
@@ -149,9 +154,9 @@ export default function Controls() {
                   flex: 1,
                   padding: '0.5rem',
                   borderRadius: '8px',
-                  border: `1px solid ${lang === 'ar' ? COLORS.foreground : COLORS.border}`,
-                  background: lang === 'ar' ? COLORS.muted : 'transparent',
-                  color: COLORS.foreground,
+                  border: `1px solid ${lang === 'ar' ? tokens.fg : tokens.borderBase}`,
+                  background: lang === 'ar' ? tokens.borderBase : 'transparent',
+                  color: tokens.fg,
                   cursor: 'pointer',
                   fontSize: '0.8rem',
                   fontWeight: lang === 'ar' ? 600 : 400,

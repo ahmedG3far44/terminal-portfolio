@@ -5,17 +5,19 @@ import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { http } from '../services/http';
 import { GitHubProvider } from '../context/GitHubContext';
+import type { Portfolio, Contact } from '../types';
+
 import Controls from '../components/Controls';
 import Header from '../components/Header';
 import GitHubBoard from '../components/GitHubBoard';
 import { getContactIcon } from '../components/ContactIcons';
-import type { Portfolio, Contact } from '../types';
+
 
 function ThemeContent() {
   const { colors, setPortfolioTheme } = useTheme();
   const { t, isRTL } = useLanguage();
   const { username } = useParams<{ username?: string }>();
-  const primary = colors?.primary || '#39ff14';
+  const primary = colors?.primary || '#ec4899';
   const rgb = colors?.rgb || '57, 255, 20';
 
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
@@ -167,11 +169,13 @@ function ThemeContent() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
             style={{
-              fontSize: '1rem',
-              maxWidth: '500px',
+              fontSize: '0.75rem',
+              maxWidth: '75%',
+              fontWeight:'lighter',
               color: `rgba(${rgb}, 0.7)`,
               lineHeight: 1.8,
               marginBottom: '2rem',
+
             }}
           >
             {personalInfo.bio}
@@ -326,12 +330,13 @@ function ThemeContent() {
                   flexDirection: 'column',
                   width: '100%',
                   position: 'relative',
+                  borderRadius:'12px',
                   overflow: 'hidden',
                   ...(project.coverImage ? { padding: 0 } : { padding: '1.5rem' }),
                 }}
               >
                 {project.coverImage ? (
-                  <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden' }}>
+                  <div style={{ position: 'relative', width: '100%', height:'100%' , overflow: 'hidden' }}>
                     {/\.mp4$/i.test(project.coverImage) ? (
                       <video
                         src={project.coverImage}
@@ -351,7 +356,7 @@ function ThemeContent() {
                     <div
                       style={{
                         position: 'absolute', inset: 0,
-                        background: `linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)`,
+                        background: `linear-gradient(to top, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.7) 50%, transparent 100%)`,
                         opacity: 0,
                         transition: 'opacity 0.25s ease',
                         display: 'flex',
@@ -361,14 +366,14 @@ function ThemeContent() {
                       }}
                       className="card-overlay"
                     >
-                      <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: primary }}>
+                      <h3 style={{ fontSize: '1.25rem', fontWeight:'bold', color: primary }}>
                         {project.title}
                       </h3>
-                      <p style={{ fontSize: '0.875rem', color: `rgba(${rgb}, 0.8)`, marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <p style={{ fontSize: '0.65rem', fontWeight:'lighter', color: `rgba(${rgb}, 0.8)`, marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {project.description}
                       </p>
                       {project.techStack.length > 0 && (
-                        <span style={{ fontSize: '0.75rem', color: `rgba(${rgb}, 0.6)` }}>
+                        <span style={{ fontSize: '0.60rem', color: `rgba(${rgb}, 0.6)` }}>
                           {'>'} {project.techStack.join(', ')}
                         </span>
                       )}

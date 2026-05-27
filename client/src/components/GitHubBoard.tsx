@@ -16,7 +16,7 @@ export default function GitHubBoard() {
   const { colors } = useTheme();
   const { t } = useLanguage();
   const rgb = colors?.rgb || '57, 255, 20';
-  const primary = colors?.primary || '#39ff14';
+  const primary = colors?.primary || '#ec4899';
 
   if (loading) {
     return (

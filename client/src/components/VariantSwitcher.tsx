@@ -8,7 +8,7 @@ export default function VariantSwitcher() {
   const displayThemes = themes.length > 0
     ? themes
     : [
-        { slug: 'green', name: 'Neon Green', primary: '#39ff14' },
+        { slug: 'pink', name: 'Pink', primary: '#ec4899' },
         { slug: 'blue', name: 'Electric Blue', primary: '#3b82f6' },
         { slug: 'purple', name: 'Vivid Purple', primary: '#a855f7' },
         { slug: 'skyblue', name: 'Sky Blue', primary: '#0ea5e9' },

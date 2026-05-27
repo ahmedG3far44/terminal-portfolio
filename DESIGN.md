@@ -2,15 +2,20 @@
 name: Terminal Portfolio
 description: A terminal-themed portfolio platform with dynamic GitHub sync, bilingual RTL, and multi-theme support
 colors:
-  neutral-bg: "#0a0a0a"
-  neutral-surface: "#141414"
-  neutral-card: "#09090b"
+  neutral-bg-dark: "#09090b"
+  neutral-surface-dark: "#141414"
+  neutral-bg-light: "#fdf2f8"
+  neutral-surface-light: "#ffffff"
   neutral-border: "#1e1e24"
   neutral-border-light: "#27272a"
-  neutral-text: "#f5f5f5"
-  neutral-text-muted: "#888888"
-  accent: "#e63946"
-  accent-secondary: "#457b9d"
+  neutral-border-light-mode: "#e5e7eb"
+  neutral-text-dark: "#fafafa"
+  neutral-text-light: "#18181b"
+  neutral-text-muted-dark: "#a1a1aa"
+  neutral-text-muted-light: "#52525b"
+  accent: "#ec4899"
+  accent-hover: "#db2777"
+  accent-secondary: "#a855f7"
 typography:
   display:
     fontFamily: "Inter, system-ui, sans-serif"
@@ -92,32 +97,42 @@ components:
 
 **Creative North Star: "The Terminal Console"**
 
-A dark-first, developer-oriented visual system that treats the terminal emulator as both metaphor and layout engine. Surfaces are flat and deliberate — zinc-950 is the canvas, white text reads as command output, and accent colors (drawn dynamically from a MongoDB theme system) provide the only chromatic relief. Borders do the work of shadows. Every element earns its place through typographic hierarchy and generous whitespace, not decoration.
+A terminal-inspired visual system with dual-mode support (dark/light). Dark mode uses zinc-950 canvas with pink accent; light mode uses pink-50 warm-white canvas with the same pink accent. Surfaces are flat and deliberate, borders do the work of shadows, and the pink accent (drawn dynamically from a MongoDB theme system) provides the only chromatic relief.
 
 The system explicitly rejects SaaS landing-page cliches: no hero-metric grids, no gradient text, no glassmorphism, no icon-on-card templates. The terminal is not a costume — it's a design constraint that produces clarity.
 
 **Key Characteristics:**
-- Dark-by-default, driven by a scene sentence (developer on a dimly-lit desk at night, focused on craft)
+- Dual-mode: dark (developer on a dimly-lit desk at night) and light (developer working in a bright room or outdoors)
 - Flat surfaces with border-based separation (no drop shadows)
+- Pink accent (#ec4899) as the default theme color
 - Typography as the primary carrier of hierarchy (Inter for headings, JetBrains Mono for code/UI)
-- Dynamic accent colors from DB themes applied to borders, text highlights, and small UI elements
+- Light mode swaps zinc neutrals for warm pink-50 tones with dark text
 - Bilingual (English/Arabic RTL) as a first-class layout concern
 
 ## 2. Colors
 
-The palette is zinc-heavy with one dynamic accent hue applied at low saturation. The accent is never the surface — it's the signal.
+Pink (#ec4899) is the default accent, with zinc-dominated neutrals in dark mode and warm pink-50 neutrals in light mode. The accent is never the surface — it's the signal.
 
 ### Primary (Dynamic)
-- **Dynamic Accent** (variable, DB-driven): Applied to CTAs, active tab indicators, bordered elements in hover state, and the terminal's glow effect. Typical seed values: green (#22c55e), purple (#a855f7), amber (#f59e0b), cyan (#06b6d4), white (#ffffff). Chroma is kept moderate; high-chroma extremes are avoided.
+- **Pink** (default #ec4899): Applied to CTAs, active tab indicators, bordered elements in hover state, and the terminal's glow effect. Default accent for all surfaces. Users can switch to other DB-driven theme variants (purple, blue, green, etc.) via the settings panel.
 
-### Neutral
-- **Canvas** (#09090b / zinc-950): Primary background. All surfaces sit on this.
-- **Surface** (#141414 / zinc-900): Secondary background for cards, terminals, and inset areas.
-- **Border Base** (#1e1e24 / zinc-850): Default stroke for cards and containers.
-- **Border Subtle** (#27272a / zinc-800): Secondary strokes, dividers, input borders.
-- **Text Primary** (#fafafa / zinc-50): Body and heading color on dark surfaces.
-- **Text Muted** (#a1a1aa / zinc-400): Secondary information, labels, footers.
-- **Text Dim** (#52525b / zinc-600): Placeholder text, disabled states.
+### Neutral — Dark Mode
+- **Canvas** (#09090b / zinc-950): Primary background.
+- **Surface** (#141414 / zinc-900): Secondary background for cards, terminals.
+- **Border Base** (#1e1e24 / zinc-850): Default stroke.
+- **Border Subtle** (#27272a / zinc-800): Secondary strokes, dividers.
+- **Text Primary** (#fafafa / zinc-50): Body and heading color.
+- **Text Muted** (#a1a1aa / zinc-400): Secondary information, labels.
+- **Text Dim** (#52525b / zinc-600): Placeholder text.
+
+### Neutral — Light Mode
+- **Canvas** (#fdf2f8 / pink-50): Primary background. Warm off-white.
+- **Surface** (#ffffff): Secondary background for cards, terminals.
+- **Border Base** (#e5e7eb / gray-200): Default stroke.
+- **Border Subtle** (#d1d5db / gray-300): Secondary strokes, dividers.
+- **Text Primary** (#18181b / zinc-900): Body and heading color.
+- **Text Muted** (#52525b / zinc-600): Secondary information, labels.
+- **Text Dim** (#9ca3af / gray-400): Placeholder text.
 
 ### Named Rules
 **The One-Accent Rule.** The accent color covers ≤10% of any screen. Its rarity is deliberate — it draws attention to interactive elements only.
@@ -150,10 +165,10 @@ Pure flat system. Depth is communicated entirely through borders — zinc-850 fo
 ## 5. Components
 
 ### Buttons
-- **Shape:** Moderately curved corners (0.5rem).
-- **Primary:** White background, black text, 0.75rem 1.5rem padding. Hover transitions background to zinc-200. Carries `font-weight: 600`.
-- **Secondary:** Zinc-900 background, zinc-300 text, 1px zinc-800 border. Hover brightens background to zinc-800/80 and text to white.
-- **State transitions:** 150ms ease, color-only.
+- **Shape:** Moderately curved corners (0.5rem). Hover scale 1.03, active scale 0.97.
+- **Primary:** Accent (#ec4899) background, dark text, 0.75rem 1.5rem padding. Hover brightens to #db2777. Carries `font-weight: 700`.
+- **Secondary:** Transparent background, muted text, 1px border-base border. Hover brightens border and text.
+- **State transitions:** 200ms ease, color-only.
 
 ### Terminal Widget
 - **Shape:** Rounded-2xl corners (1.25rem), zinc-950 background, zinc-800/80 border.
@@ -186,7 +201,8 @@ Pure flat system. Depth is communicated entirely through borders — zinc-850 fo
 ## 6. Do's and Don'ts
 
 ### Do:
-- **Do** use zinc-dominated backgrounds (950, 900) with white/zinc-100 text.
+- **Do** use pink (#ec4899) as the default accent for interactive elements.
+- **Do** use dark mode (zinc-950 canvas) for dim environments, light mode (pink-50 canvas) for bright environments.
 - **Do** apply accent color sparingly — active tabs, borders on hover, terminal glow.
 - **Do** use JetBrains Mono for any element that looks or acts like a terminal (code blocks, command inputs, connection labels).
 - **Do** keep cards flat with border-only separation and hover border shifts.

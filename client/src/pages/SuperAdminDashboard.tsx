@@ -224,7 +224,7 @@ function ThemesTab() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
             <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Name (e.g. Neon Green)" style={{ padding: '0.5rem', background: COLORS.muted, border: `1px solid ${COLORS.border}`, borderRadius: '0.375rem', color: COLORS.foreground, outline: 'none' }} />
             <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="Slug (e.g. green)" style={{ padding: '0.5rem', background: COLORS.muted, border: `1px solid ${COLORS.border}`, borderRadius: '0.375rem', color: COLORS.foreground, outline: 'none' }} />
-            <input value={form.primary} onChange={(e) => setForm({ ...form, primary: e.target.value })} placeholder="Primary (e.g. #39ff14)" style={{ padding: '0.5rem', background: COLORS.muted, border: `1px solid ${COLORS.border}`, borderRadius: '0.375rem', color: COLORS.foreground, outline: 'none' }} />
+            <input value={form.primary} onChange={(e) => setForm({ ...form, primary: e.target.value })} placeholder="Primary (e.g. #ec4899)" style={{ padding: '0.5rem', background: COLORS.muted, border: `1px solid ${COLORS.border}`, borderRadius: '0.375rem', color: COLORS.foreground, outline: 'none' }} />
             <input value={form.rgb} onChange={(e) => setForm({ ...form, rgb: e.target.value })} placeholder="RGB (e.g. 57, 255, 20)" style={{ padding: '0.5rem', background: COLORS.muted, border: `1px solid ${COLORS.border}`, borderRadius: '0.375rem', color: COLORS.foreground, outline: 'none' }} />
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>

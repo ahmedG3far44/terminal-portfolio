@@ -22,7 +22,7 @@ export default function ProjectDetails() {
   const { colors, setPortfolioTheme } = useTheme();
   const { t, isRTL } = useLanguage();
   const { getReadme } = useGitHub();
-  const primary = colors?.primary || '#39ff14';
+  const primary = colors?.primary || '#ec4899';
   const rgb = colors?.rgb || '57, 255, 20';
 
   const [project, setProject] = useState<Project | null>(null);
@@ -189,11 +189,11 @@ export default function ProjectDetails() {
           style={{
             fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
             fontWeight: 700,
-            marginBottom: '1rem',
+            margin: '1.5rem 0rem',
             textShadow: `0 0 30px rgba(${rgb}, 0.3)`,
           }}
         >
-          {project.title}
+          {project.title.toUpperCase()}
         </motion.h1>
 
         {project.tags.length > 0 && (
@@ -254,8 +254,8 @@ export default function ProjectDetails() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
           style={{
-            fontSize: '1rem',
-            lineHeight: 1.8,
+            fontSize: '0.75rem',
+            lineHeight: 1.5,
             color: `rgba(${rgb}, 0.8)`,
             marginBottom: '2rem',
           }}

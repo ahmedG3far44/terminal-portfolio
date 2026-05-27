@@ -4,18 +4,26 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
   type ReactNode,
 } from 'react';
 import { http } from '../services/http';
 import type { Theme } from '../types';
+import type { ColorMode, ColorTokens } from '../colors';
+import { resolveTokens, defaultAccent, defaultAccentRgb, themeVariants } from '../colors';
 
 const STORAGE_KEY = 'theme-variant';
+const MODE_KEY = 'color-mode';
 
 interface ThemeContextType {
   variant: string;
   setVariant: (slug: string) => void;
   setPortfolioTheme: (slug: string | null) => void;
+  mode: ColorMode;
+  setMode: (mode: ColorMode) => void;
+  toggleMode: () => void;
   colors: { primary: string; rgb: string; name: string } | null;
+  tokens: ColorTokens;
   themes: Theme[];
 }
 
@@ -26,7 +34,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [portfolioOverride, setPortfolioOverride] = useState<string | null>(null);
   const [localVariant, setLocalVariant] = useState<string>(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored || 'green';
+    return stored || 'pink';
+  });
+  const [mode, setModeState] = useState<ColorMode>(() => {
+    return (localStorage.getItem(MODE_KEY) as ColorMode) || 'dark';
   });
 
   const variant = portfolioOverride ?? localVariant;
@@ -47,14 +58,28 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setPortfolioOverride(slug);
   }, []);
 
+  const setMode = useCallback((m: ColorMode) => {
+    localStorage.setItem(MODE_KEY, m);
+    setModeState(m);
+  }, []);
+
+  const toggleMode = useCallback(() => {
+    setMode(mode === 'dark' ? 'light' : 'dark');
+  }, [mode, setMode]);
+
   const currentTheme = themes.find((t) => t.slug === variant);
-  const fallback = themes[0] || { primary: '#39ff14', rgb: '57, 255, 20', name: 'Neon Green' };
+  const fallback = themeVariants.find((t) => t.slug === variant) || themeVariants[0];
   const colors = currentTheme
     ? { primary: currentTheme.primary, rgb: currentTheme.rgb, name: currentTheme.name }
-    : fallback;
+    : { primary: fallback.primary, rgb: fallback.rgb, name: fallback.name };
+
+  const tokens = useMemo(
+    () => resolveTokens(mode, colors.primary, colors.rgb),
+    [mode, colors.primary, colors.rgb],
+  );
 
   return (
-      <ThemeContext.Provider value={{ variant, setVariant, setPortfolioTheme, colors, themes }}>
+    <ThemeContext.Provider value={{ variant, setVariant, setPortfolioTheme, mode, setMode, toggleMode, colors, tokens, themes }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -65,3 +90,5 @@ export function useTheme() {
   if (!context) throw new Error('useTheme must be used within ThemeProvider');
   return context;
 }
+
+export { defaultAccent, defaultAccentRgb, themeVariants };

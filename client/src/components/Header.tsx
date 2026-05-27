@@ -6,7 +6,7 @@ import { LogIn, LayoutDashboard, LogOut, User } from 'lucide-react';
 export default function Header() {
   const { isAuthenticated, user, loading, login, logout } = useAuth();
   const { colors } = useTheme();
-  const primary = colors?.primary || '#39ff14';
+  const primary = colors?.primary || '#ec4899';
   const rgb = colors?.rgb || '57, 255, 20';
 
   return (
