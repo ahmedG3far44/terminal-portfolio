@@ -8,7 +8,7 @@ import {
 import { http } from '../services/http';
 import { useAuth } from './AuthContext';
 import { useQuery, useMutation } from '../hooks/useQuery';
-import type { Portfolio, PersonalInfo, Project } from '../types';
+import type { Portfolio, PersonalInfo, Project, Contact } from '../types';
 
 interface AdminContextType {
   data: Portfolio | null;
@@ -21,6 +21,10 @@ interface AdminContextType {
   deleteProject: (id: string) => Promise<void>;
   addSkill: (skill: string) => Promise<void>;
   deleteSkill: (skill: string) => Promise<void>;
+  addContact: (contact: { type: string; value: string; label?: string }) => Promise<void>;
+  updateContact: (id: string, contact: Partial<Contact>) => Promise<void>;
+  deleteContact: (id: string) => Promise<void>;
+  migrateSocialFields: () => Promise<void>;
   resetData: () => Promise<void>;
   saving: boolean;
 }
@@ -119,6 +123,46 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     }
   }, [portfolioQuery]);
 
+  const addContact = useCallback(async (contact: { type: string; value: string; label?: string }) => {
+    setSaving(true);
+    try {
+      await http.post('/contacts', contact);
+      portfolioQuery.refetch();
+    } finally {
+      setSaving(false);
+    }
+  }, [portfolioQuery]);
+
+  const updateContact = useCallback(async (id: string, contact: Partial<Contact>) => {
+    setSaving(true);
+    try {
+      await http.put(`/contacts/${id}`, contact);
+      portfolioQuery.refetch();
+    } finally {
+      setSaving(false);
+    }
+  }, [portfolioQuery]);
+
+  const deleteContact = useCallback(async (id: string) => {
+    setSaving(true);
+    try {
+      await http.del(`/contacts/${id}`);
+      portfolioQuery.refetch();
+    } finally {
+      setSaving(false);
+    }
+  }, [portfolioQuery]);
+
+  const migrateSocialFields = useCallback(async () => {
+    setSaving(true);
+    try {
+      await http.post('/contacts/migrate');
+      portfolioQuery.refetch();
+    } finally {
+      setSaving(false);
+    }
+  }, [portfolioQuery]);
+
   const resetData = useCallback(async () => {
     setSaving(true);
     try {
@@ -142,6 +186,10 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         deleteProject,
         addSkill,
         deleteSkill,
+        addContact,
+        updateContact,
+        deleteContact,
+        migrateSocialFields,
         resetData,
         saving,
       }}

@@ -8,10 +8,11 @@ import { useGitHub } from '../context/GitHubContext';
 import { GitHubProvider } from '../context/GitHubContext';
 import {
   FolderKanban, GitBranch, Wrench, User, Menu, X, Home, Loader2,
-  Plus, Pencil, Trash2, Check, Star, GitFork, LucideLogOut,
+  Plus, Pencil, Trash2, Check, Star, GitFork, LucideLogOut, Link as LinkIcon,
 } from 'lucide-react';
 import { http } from '../services/http';
-import type { Project, PersonalInfo } from '../types';
+import { getContactIcon } from '../components/ContactIcons';
+import type { Project, PersonalInfo, Contact } from '../types';
 
 const COLORS = {
   background: '#09090b',
@@ -133,17 +134,18 @@ function TagInput({
 }
 
 function CoverImageUpload({
-  value, onChange, disabled,
+  value, onChange, disabled, onBusyChange,
 }: {
   value: string | null;
   onChange: (url: string | null) => void;
   disabled: boolean;
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4'];
-  const MAX_SIZE = 4 * 1024 * 1024;
+  const MAX_SIZE = 20 * 1024 * 1024;
 
   const previewUrl = file ? URL.createObjectURL(file) : value;
   const isVideo = previewUrl
@@ -170,7 +172,7 @@ function CoverImageUpload({
     }
 
     if (f.size > MAX_SIZE) {
-      setError('File too large. Max 4MB.');
+      setError('File too large. Max 20MB.');
       setFile(null);
       e.target.value = '';
       return;
@@ -183,6 +185,7 @@ function CoverImageUpload({
   const handleUpload = async () => {
     if (!file) return;
     setUploading(true);
+    onBusyChange?.(true);
     setError(null);
     try {
       const result = await http.upload<{ url: string }>('/upload', file);
@@ -192,6 +195,7 @@ function CoverImageUpload({
       setError(err.message || 'Upload failed');
     } finally {
       setUploading(false);
+      onBusyChange?.(false);
     }
   };
 
@@ -394,6 +398,7 @@ function SidebarContent({
     { id: 'repos', label: 'GitHub Repos', icon: GitBranch },
     { id: 'skills', label: t('admin.skills') || 'Skills', icon: Wrench },
     { id: 'personalInfo', label: t('admin.personalInfo') || 'Personal Info', icon: User },
+    { id: 'contacts', label: t('contact.title') || 'Contacts', icon: LinkIcon },
   ];
 
   return (
@@ -439,7 +444,7 @@ function SidebarContent({
 }
 
 function AdminContent() {
-  const { data, loading, error, refetch, updatePersonalInfo, addProject, updateProject, deleteProject, addSkill, deleteSkill, saving } = useAdmin();
+  const { data, loading, error, refetch, updatePersonalInfo, addProject, updateProject, deleteProject, addSkill, deleteSkill, addContact, updateContact, deleteContact, migrateSocialFields, saving } = useAdmin();
   const { user } = useAuth();
   const { t } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -513,6 +518,17 @@ function AdminContent() {
           {activeTab === 'personalInfo' && data && (
             <PersonalInfoTab info={data.personalInfo} onSave={updatePersonalInfo} t={t} saving={saving} />
           )}
+          {activeTab === 'contacts' && data && (
+            <ContactsTab
+              contacts={data.contacts}
+              onAdd={addContact}
+              onEdit={updateContact}
+              onDelete={deleteContact}
+              onMigrate={migrateSocialFields}
+              t={t}
+              saving={saving}
+            />
+          )}
         </div>
       </main>
     </div>
@@ -534,6 +550,7 @@ function ProjectsTab({
   const [editingProject, setEditingProject] = useState<Omit<Project, '_id' | 'id'> | Project | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [savingForm, setSavingForm] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
 
   const validate = (project: any) => {
     const newErrors: Record<string, string> = {};
@@ -572,7 +589,7 @@ function ProjectsTab({
     setErrors({});
   };
 
-  const isSaving = savingForm || saving;
+  const isSaving = savingForm || saving || uploadingCover;
 
   return (
     <div>
@@ -643,6 +660,7 @@ function ProjectsTab({
                 value={(editingProject as any).coverImage || null}
                 onChange={(url) => setEditingProject((p: any) => ({ ...p, coverImage: url }))}
                 disabled={isSaving}
+                onBusyChange={setUploadingCover}
               />
             </div>
             <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
@@ -677,11 +695,29 @@ function ReposTabWrapper({ t }: { t: (key: string) => string }) {
   return <GitHubProvider><ReposTabInner t={t} /></GitHubProvider>;
 }
 
+const CACHE_KEY = 'github-repos-cache';
+
 function ReposTabInner({ t }: { t: (key: string) => string }) {
-  const { repos, repoLoading, loadRepos } = useGitHub();
-  const { data, addProject, saving } = useAdmin();
+  const { repos: fetchedRepos, repoLoading, loadRepos } = useGitHub();
+  const { data, saving, refetch: refetchPortfolio } = useAdmin();
   const [selectedRepos, setSelectedRepos] = useState<any[]>([]);
   const [importing, setImporting] = useState(false);
+  const [cachedRepos, setCachedRepos] = useState<any[] | null>(() => {
+    try {
+      const cached = sessionStorage.getItem(CACHE_KEY);
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const repos = fetchedRepos.length > 0 ? fetchedRepos : (cachedRepos || []);
+
+  const handleLoadRepos = () => {
+    sessionStorage.removeItem(CACHE_KEY);
+    setCachedRepos(null);
+    loadRepos();
+  };
 
   const toggleRepo = (repo: any) => {
     setSelectedRepos((prev) => {
@@ -694,20 +730,20 @@ function ReposTabInner({ t }: { t: (key: string) => string }) {
   const importSelected = async () => {
     setImporting(true);
     try {
-      for (const repo of selectedRepos) {
-        const slug = repo.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        await addProject({
-          title: repo.name,
-          description: repo.description || '',
-          slug,
-          repoUrl: repo.url,
-          liveDemoUrl: '',
-          tags: [],
-          techStack: [],
-          tools: [],
-          coverImage: null,
-        });
-      }
+      const newProjects = selectedRepos.map((repo: any) => ({
+        title: repo.name,
+        description: repo.description || '',
+        slug: repo.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        repoUrl: repo.url,
+        liveDemoUrl: '',
+        tags: [],
+        techStack: [],
+        tools: [],
+        coverImage: null,
+      }));
+      const current = data?.projects || [];
+      await http.put('/portfolio', { projects: [...current, ...newProjects] });
+      refetchPortfolio();
       setSelectedRepos([]);
     } finally {
       setImporting(false);
@@ -717,12 +753,19 @@ function ReposTabInner({ t }: { t: (key: string) => string }) {
   const isBusy = repoLoading || importing || saving;
   const isAdded = (url: string) => data?.projects.some((p) => p.repoUrl === url);
 
+  useEffect(() => {
+    if (fetchedRepos.length > 0) {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify(fetchedRepos));
+      setCachedRepos(fetchedRepos);
+    }
+  }, [fetchedRepos]);
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: COLORS.foreground }}>GitHub Repositories</h3>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button onClick={loadRepos} disabled={isBusy} style={{ ...btnPrimary, opacity: isBusy ? 0.6 : 1 }}>
+          <button onClick={handleLoadRepos} disabled={isBusy} style={{ ...btnPrimary, opacity: isBusy ? 0.6 : 1 }}>
             {repoLoading ? <Spinner size={16} /> : <GitBranch size={16} />}
             {repoLoading ? 'Loading...' : 'Fetch Repos'}
           </button>
@@ -737,7 +780,7 @@ function ReposTabInner({ t }: { t: (key: string) => string }) {
       {repos.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem', color: COLORS.mutedForeground, background: COLORS.muted, borderRadius: '0.75rem' }}>
           <GitBranch size={32} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-          <p>Click "Fetch Repos" to load your repositories</p>
+          <p>{cachedRepos === null ? 'Click "Fetch Repos" to load your repositories' : 'No repositories found'}</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '60vh', overflowY: 'auto' }}>
@@ -894,10 +937,6 @@ function PersonalInfoTab({ info, onSave, t, saving }: {
           <textarea value={form.bio} onChange={(e) => handleChange('bio', e.target.value)} disabled={isBusy} placeholder="Your bio" rows={4} style={{ ...(isBusy ? inputDisabledStyle : inputStyle), resize: 'vertical' }} />
         </div>
         <div>
-          <label style={{ fontSize: '0.875rem', color: COLORS.mutedForeground, marginBottom: '0.5rem', display: 'block' }}>Email</label>
-          <input value={form.email} onChange={(e) => handleChange('email', e.target.value)} disabled={isBusy} placeholder="email@example.com" style={isBusy ? inputDisabledStyle : inputStyle} />
-        </div>
-        <div>
           <label style={{ fontSize: '0.875rem', color: COLORS.mutedForeground, marginBottom: '0.5rem', display: 'block' }}>Available for Hire</label>
           <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: COLORS.foreground, fontSize: '0.875rem', cursor: isBusy ? 'default' : 'pointer' }}>
             <input type="checkbox" checked={form.availableForHire} onChange={(e) => handleChange('availableForHire', e.target.checked)} disabled={isBusy} style={{ accentColor: COLORS.primary }} />
@@ -911,6 +950,195 @@ function PersonalInfoTab({ info, onSave, t, saving }: {
           {!savingLocal && saving && <Spinner size={14} />}
         </div>
       </div>
+    </div>
+  );
+}
+
+function ContactsTab({
+  contacts, onAdd, onEdit, onDelete, onMigrate, t, saving,
+}: {
+  contacts: Contact[];
+  onAdd: (c: { type: string; value: string; label?: string }) => Promise<void>;
+  onEdit: (id: string, c: Partial<Contact>) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+  onMigrate: () => Promise<void>;
+  t: (key: string) => string;
+  saving: boolean;
+}) {
+  const [type, setType] = useState('');
+  const [value, setValue] = useState('');
+  const [label, setLabel] = useState('');
+  const [error, setError] = useState('');
+  const [savingLocal, setSavingLocal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState('');
+  const [editLabel, setEditLabel] = useState('');
+  const [migrated, setMigrated] = useState(false);
+
+  const contactTypes = [
+    'linkedin', 'github', 'x', 'instagram', 'email', 'phone',
+    'website', 'youtube', 'dribbble', 'behance', 'medium', 'other',
+  ];
+
+  const validate = (typeVal: string, val: string): string | null => {
+    if (!val.trim()) return 'contact.validation.required';
+    switch (typeVal) {
+      case 'email':
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) ? null : 'contact.validation.invalidEmail';
+      case 'phone':
+        return /^\+?[\d\s\-()]{7,20}$/.test(val) ? null : 'contact.validation.invalidPhone';
+      case 'linkedin':
+      case 'github':
+      case 'x':
+      case 'instagram':
+      case 'website':
+      case 'youtube':
+      case 'dribbble':
+      case 'behance':
+      case 'medium':
+      case 'other':
+        return /^https?:\/\/.+/.test(val) ? null : 'contact.validation.invalidUrl';
+      default:
+        return null;
+    }
+  };
+
+  const handleAdd = async () => {
+    const validationError = validate(type, value);
+    if (validationError) { setError(t(validationError)); return; }
+    if (!type) { setError(t('contact.validation.required')); return; }
+    setSavingLocal(true);
+    setError('');
+    try {
+      await onAdd({ type, value, label: label || undefined });
+      setType('');
+      setValue('');
+      setLabel('');
+    } finally {
+      setSavingLocal(false);
+    }
+  };
+
+  const startEdit = (contact: Contact) => {
+    setEditingId(contact._id || contact.id || '');
+    setEditValue(contact.value);
+    setEditLabel(contact.label || '');
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditValue('');
+    setEditLabel('');
+  };
+
+  const saveEdit = async (contact: Contact) => {
+    const validationError = validate(contact.type, editValue);
+    if (validationError) { setError(t(validationError)); return; }
+    setSavingLocal(true);
+    setError('');
+    try {
+      await onEdit(contact._id || contact.id || '', { value: editValue, label: editLabel || '' });
+      cancelEdit();
+    } finally {
+      setSavingLocal(false);
+    }
+  };
+
+  const isBusy = savingLocal || saving;
+
+  const needsMigration = contacts.length === 0;
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: COLORS.foreground }}>{t('contact.title')}</h3>
+        {needsMigration && !migrated && (
+          <button onClick={async () => { await onMigrate(); setMigrated(true); }} disabled={isBusy} style={{ ...btnGhost, opacity: isBusy ? 0.6 : 1 }}>
+            {t('contact.migrate')}
+          </button>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+        <select
+          value={type}
+          onChange={(e) => { setType(e.target.value); setError(''); }}
+          disabled={isBusy}
+          style={{ ...(isBusy ? inputDisabledStyle : inputStyle), width: '160px' }}
+        >
+          <option value="">{t('contact.type')}</option>
+          {contactTypes.map((ct) => (
+            <option key={ct} value={ct}>{t(`contact.types.${ct}`)}</option>
+          ))}
+        </select>
+        <input
+          value={value}
+          onChange={(e) => { setValue(e.target.value); setError(''); }}
+          placeholder={t('contact.value')}
+          disabled={isBusy}
+          style={{ ...(isBusy ? inputDisabledStyle : inputStyle), flex: 1, minWidth: '200px' }}
+        />
+        <input
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+          placeholder={t('contact.label')}
+          disabled={isBusy}
+          style={{ ...(isBusy ? inputDisabledStyle : inputStyle), width: '160px' }}
+        />
+        <button onClick={handleAdd} disabled={!type || !value.trim() || isBusy} style={{ ...btnPrimary, opacity: !type || !value.trim() || isBusy ? 0.6 : 1 }}>
+          {savingLocal ? <Spinner size={14} /> : <Plus size={16} />}
+        </button>
+      </div>
+
+      {error && <p style={{ ...errorTextStyle, marginBottom: '0.75rem' }}>{error}</p>}
+
+      {contacts.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '3rem', color: COLORS.mutedForeground, background: COLORS.muted, borderRadius: '0.75rem' }}>
+          <LinkIcon size={32} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
+          <p>{t('contact.noContacts')}</p>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {contacts.map((contact) => {
+            const Icon = getContactIcon(contact.type);
+            const isEditing = editingId === (contact._id || contact.id);
+            return (
+              <div key={contact._id || contact.id} style={{ background: COLORS.muted, padding: '0.75rem 1rem', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.75rem', border: `1px solid ${COLORS.border}` }}>
+                <Icon size={18} style={{ color: COLORS.mutedForeground, flexShrink: 0 }} />
+                <span style={{ fontSize: '0.8rem', fontWeight: 500, color: COLORS.mutedForeground, minWidth: '80px', textTransform: 'capitalize' }}>
+                  {t(`contact.types.${contact.type}`)}
+                </span>
+                {isEditing ? (
+                  <div style={{ display: 'flex', gap: '0.5rem', flex: 1, alignItems: 'center' }}>
+                    <input value={editValue} onChange={(e) => setEditValue(e.target.value)} style={{ ...inputStyle, flex: 1 }} autoFocus />
+                    <input value={editLabel} onChange={(e) => setEditLabel(e.target.value)} placeholder={t('contact.label')} style={{ ...inputStyle, width: '120px' }} />
+                    <button onClick={() => saveEdit(contact)} disabled={isBusy} style={{ ...btnPrimary, padding: '0.375rem 0.75rem', fontSize: '0.8rem', opacity: isBusy ? 0.6 : 1 }}>
+                      <Check size={14} />
+                    </button>
+                    <button onClick={cancelEdit} disabled={isBusy} style={{ ...btnGhost, padding: '0.375rem 0.75rem', fontSize: '0.8rem', opacity: isBusy ? 0.6 : 1 }}>
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <span style={{ flex: 1, fontSize: '0.875rem', color: COLORS.foreground, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {contact.label ? `${contact.label} (${contact.value})` : contact.value}
+                    </span>
+                    <div style={{ display: 'flex', gap: '0.375rem', flexShrink: 0 }}>
+                      <button onClick={() => startEdit(contact)} disabled={isBusy} style={{ ...btnGhost, padding: '0.375rem', color: COLORS.foreground, opacity: isBusy ? 0.4 : 1 }}>
+                        <Pencil size={14} />
+                      </button>
+                      <button onClick={() => onDelete(contact._id || contact.id || '')} disabled={isBusy} style={{ ...btnGhost, padding: '0.375rem', color: COLORS.destructive, opacity: isBusy ? 0.4 : 1 }}>
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

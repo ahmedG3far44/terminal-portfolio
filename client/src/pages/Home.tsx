@@ -8,7 +8,8 @@ import { GitHubProvider } from '../context/GitHubContext';
 import Controls from '../components/Controls';
 import Header from '../components/Header';
 import GitHubBoard from '../components/GitHubBoard';
-import type { Portfolio } from '../types';
+import { getContactIcon } from '../components/ContactIcons';
+import type { Portfolio, Contact } from '../types';
 
 function ThemeContent() {
   const { colors, setPortfolioTheme } = useTheme();
@@ -84,9 +85,9 @@ function ThemeContent() {
 
   const projects = portfolio.projects || [];
   const skills = portfolio.skills || [];
+  const contacts = portfolio.contacts || [];
   const personalInfo = portfolio.personalInfo || {
     name: '', title: '', bio: '', availableForHire: false,
-    email: '', linkedin: '', github: '',
   };
 
   return (
@@ -215,6 +216,47 @@ function ThemeContent() {
             >
               <span style={{ animation: 'blink 1s infinite' }}>▋</span>{' '}
               {t('header.availableForHire')}
+            </motion.div>
+          )}
+
+          {contacts.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1 }}
+              style={{
+                marginTop: '1.5rem',
+                display: 'flex',
+                gap: '1.25rem',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+              }}
+            >
+              {contacts.map((contact: Contact) => {
+                const Icon = getContactIcon(contact.type);
+                return (
+                  <a
+                    key={contact._id || contact.id}
+                    href={contact.type === 'email' ? `mailto:${contact.value}` :  contact.value}
+                    target={contact.type === 'email' ? '_self' : '_blank'}
+                    rel="noopener noreferrer"
+                    style={{
+                      color: `rgba(${rgb}, 0.5)`,
+                      fontSize: '0.8rem',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      transition: 'color 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = `rgba(${rgb}, 1)`; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = `rgba(${rgb}, 0.5)`; }}
+                  >
+                    <Icon size={14} />
+                    {contact.label || contact.value.replace(/^https?:\/\/(www\.)?/, '')}
+                  </a>
+                );
+              })}
             </motion.div>
           )}
         </motion.div>

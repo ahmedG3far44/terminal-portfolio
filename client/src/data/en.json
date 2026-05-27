@@ -22,10 +22,38 @@
     "title": "Skills"
   },
   "contact": {
-    "title": "Get In Touch",
-    "email": "Email",
-    "linkedin": "LinkedIn",
-    "github": "GitHub"
+    "title": "Contacts",
+    "add": "Add Contact",
+    "edit": "Edit",
+    "delete": "Delete",
+    "type": "Type",
+    "value": "Value",
+    "label": "Label",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "noContacts": "No contacts yet",
+    "migrate": "Migrate old social fields",
+    "migrateDone": "Migrated",
+    "types": {
+      "linkedin": "LinkedIn",
+      "github": "GitHub",
+      "x": "X (Twitter)",
+      "instagram": "Instagram",
+      "email": "Email",
+      "phone": "Phone",
+      "website": "Website",
+      "youtube": "YouTube",
+      "dribbble": "Dribbble",
+      "behance": "Behance",
+      "medium": "Medium",
+      "other": "Other"
+    },
+    "validation": {
+      "invalidUrl": "Please enter a valid URL",
+      "invalidEmail": "Please enter a valid email",
+      "invalidPhone": "Please enter a valid phone number",
+      "required": "This field is required"
+    }
   },
   "admin": {
     "login": "Login",

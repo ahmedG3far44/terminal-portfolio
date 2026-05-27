@@ -1,5 +1,12 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+export interface IContact {
+  _id?: mongoose.Types.ObjectId;
+  type: string;
+  value: string;
+  label?: string;
+}
+
 export interface IProject {
   slug: string;
   title: string;
@@ -19,16 +26,23 @@ export interface IPortfolio extends Document {
     title: string;
     bio: string;
     availableForHire: boolean;
-    email: string;
-    linkedin: string;
-    github: string;
   };
   skills: string[];
   projects: IProject[];
+  contacts: IContact[];
   activeTheme: string;
   createdAt: Date;
   updatedAt: Date;
 }
+
+const contactSchema = new Schema<IContact>(
+  {
+    type: { type: String, required: true },
+    value: { type: String, required: true },
+    label: { type: String, default: '' },
+  },
+  { timestamps: false }
+);
 
 const projectSchema = new Schema<IProject>(
   {
@@ -53,12 +67,10 @@ const portfolioSchema = new Schema<IPortfolio>(
       title: { type: String, default: '' },
       bio: { type: String, default: '' },
       availableForHire: { type: Boolean, default: true },
-      email: { type: String, default: '' },
-      linkedin: { type: String, default: '' },
-      github: { type: String, default: '' },
     },
     skills: [{ type: String }],
     projects: [projectSchema],
+    contacts: [contactSchema],
     activeTheme: { type: String, default: 'green' },
   },
   { timestamps: true }

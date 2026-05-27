@@ -124,9 +124,10 @@ export async function resetPortfolio(req: AuthRequest, res: Response) {
       return res.status(404).json({ success: false, error: 'Portfolio not found' });
     }
 
-    portfolio.personalInfo = { name: '', title: '', bio: '', availableForHire: false, email: '', linkedin: '', github: '' };
+    portfolio.personalInfo = { name: '', title: '', bio: '', availableForHire: false } as any;
     portfolio.skills = [];
     portfolio.projects = [];
+    portfolio.contacts = [];
     await portfolio.save();
 
     res.json({ success: true, data: portfolio });

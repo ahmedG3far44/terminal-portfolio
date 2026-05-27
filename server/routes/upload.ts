@@ -6,7 +6,7 @@ import { requireAuth, AuthRequest } from '../middlewares/auth';
 const router = Router();
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 4 * 1024 * 1024 },
+  limits: { fileSize: 20 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const allowed = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4'];
     if (allowed.includes(file.mimetype)) {
@@ -21,7 +21,7 @@ router.post('/', requireAuth, (req: Request, res: Response) => {
   upload.single('file')(req, res, async (err) => {
     if (err) {
       if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
-        return res.status(400).json({ success: false, error: 'File too large. Max 4MB.' });
+        return res.status(400).json({ success: false, error: 'File too large. Max 20MB.' });
       }
       return res.status(400).json({ success: false, error: err.message });
     }

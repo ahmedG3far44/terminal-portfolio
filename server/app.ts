@@ -10,6 +10,7 @@ import githubRoutes from './routes/github';
 import adminRoutes from './routes/admin';
 import publicThemesRoutes from './routes/publicThemes';
 import uploadRoutes from './routes/upload';
+import contactRoutes from './routes/contacts';
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/github', githubRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/themes', publicThemesRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/contacts', contactRoutes);
 
 
 app.get('/api/health', (_req, res) => {

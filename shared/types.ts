@@ -1,11 +1,29 @@
+export type ContactType =
+  | 'linkedin'
+  | 'github'
+  | 'x'
+  | 'instagram'
+  | 'email'
+  | 'phone'
+  | 'website'
+  | 'youtube'
+  | 'dribbble'
+  | 'behance'
+  | 'medium'
+  | 'other';
+
+export interface Contact {
+  _id?: string;
+  type: ContactType;
+  value: string;
+  label?: string;
+}
+
 export interface PersonalInfo {
   name: string;
   title: string;
   bio: string;
   availableForHire: boolean;
-  email: string;
-  linkedin: string;
-  github: string;
 }
 
 export interface Project {
@@ -25,6 +43,7 @@ export interface Portfolio {
   personalInfo: PersonalInfo;
   skills: string[];
   projects: Project[];
+  contacts: Contact[];
   activeTheme?: string;
 }
 
