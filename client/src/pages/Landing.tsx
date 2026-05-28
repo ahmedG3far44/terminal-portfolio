@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Terminal, Shield, Palette, Globe, Database, GitBranch, LayoutDashboard, Code2, LogIn, User, Loader2 } from 'lucide-react';
+import Logo from '@/components/Logo';
 
 const easeOut = [0.25, 1, 0.5, 1];
 
@@ -230,8 +231,7 @@ export default function Landing() {
           whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
           style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: tokens.accent, fontWeight: 700, fontSize: '1.1rem' }}
         >
-          <Terminal size={20} />
-          Portfolio Platform
+          <Logo/>
         </motion.div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           {authLoading ? (
@@ -276,9 +276,9 @@ export default function Landing() {
               {loggingIn ? 'Redirecting...' : 'Login'}
             </motion.button>
           )}
-          <Link to="/admin" style={{ color: tokens.textMuted, textDecoration: 'none', fontSize: '0.875rem' }}>Admin</Link>
+          <Link to="/dashboard" style={{ color: tokens.textMuted, textDecoration: 'none', fontSize: '0.875rem' }}>Dashboard</Link>
           {isSuperAdmin && (
-            <Link to="/admin/super" style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', background: tokens.accent, color: tokens.bg, textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600 }}>
+            <Link to="/admin" style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', background: tokens.accent, color: tokens.bg, textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600 }}>
               Super Admin
             </Link>
           )}

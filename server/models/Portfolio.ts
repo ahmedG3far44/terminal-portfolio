@@ -31,6 +31,8 @@ export interface IPortfolio extends Document {
   projects: IProject[];
   contacts: IContact[];
   activeTheme: string;
+  showGitHubBoard: boolean;
+  customization: Record<string, any>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -72,6 +74,8 @@ const portfolioSchema = new Schema<IPortfolio>(
     projects: [projectSchema],
     contacts: [contactSchema],
     activeTheme: { type: String, default: 'green' },
+    showGitHubBoard: { type: Boolean, default: true },
+    customization: { type: Schema.Types.Mixed, default: {} },
   },
   { timestamps: true }
 );

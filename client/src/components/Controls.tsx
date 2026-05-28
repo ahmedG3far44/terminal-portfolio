@@ -31,6 +31,8 @@ export default function Controls() {
 
   const availableThemes = themes.length > 0 ? themes : themeVariants;
 
+  if (!isAuthenticated) return null;
+
   return (
     <>
       <button

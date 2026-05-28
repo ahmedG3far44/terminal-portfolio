@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import NotFoundPage from './NotFoundPage';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -111,22 +112,7 @@ export default function ProjectDetails() {
   }
 
   if (notFound || !project) {
-    return (
-      <div
-        style={{
-          minHeight: '100vh',
-          background: '#0d1117',
-          color: primary,
-          fontFamily: "'JetBrains Mono', monospace",
-          padding: '2rem',
-        }}
-      >
-        <Link to={username ? `/${username}` : '/portfolio'} style={{ color: primary, textDecoration: 'none' }}>
-          ← {t('nav.back')}
-        </Link>
-        <h1 style={{ marginTop: '2rem' }}>Project not found</h1>
-      </div>
-    );
+    return <NotFoundPage />;
   }
 
   return (

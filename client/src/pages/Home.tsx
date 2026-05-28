@@ -1,22 +1,31 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Link, useParams } from 'react-router-dom';
+import NotFoundPage from './NotFoundPage';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { http } from '../services/http';
 import { GitHubProvider } from '../context/GitHubContext';
+import { resolveSectionStyles } from '../styles/customizationUtils';
 import type { Portfolio, Contact } from '../types';
 
 import Controls from '../components/Controls';
 import Header from '../components/Header';
-import GitHubBoard from '../components/GitHubBoard';
 import { getContactIcon } from '../components/ContactIcons';
+
+const GitHubBoard = lazy(() => import('../components/GitHubBoard'));
 
 
 function ThemeContent() {
   const { colors, setPortfolioTheme } = useTheme();
   const { t, isRTL } = useLanguage();
   const { username } = useParams<{ username?: string }>();
+  const reducedMotion = useReducedMotion();
+
+  const easeOutQuart = [0.25, 1, 0.5, 1] as const;
+  const scrollReveal = reducedMotion
+    ? {}
+    : { initial: { opacity: 0, y: 24 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true } as const };
   const primary = colors?.primary || '#ec4899';
   const rgb = colors?.rgb || '57, 255, 20';
 
@@ -56,9 +65,22 @@ function ThemeContent() {
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    let timer: ReturnType<typeof setTimeout>;
+    const handleResize = () => {
+      clearTimeout(timer);
+      timer = setTimeout(checkMobile, 80);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timer);
+    };
   }, []);
+
+  const { sectionStyles, rawCss } = useMemo(
+    () => resolveSectionStyles(portfolio?.customization),
+    [portfolio?.customization]
+  );
 
   if (loading) {
     return (
@@ -70,20 +92,8 @@ function ThemeContent() {
   }
 
   if (error || !portfolio) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0d1117', color: primary, fontFamily: "'JetBrains Mono', monospace" }}>
-        <p style={{ opacity: 0.5 }}>{error || 'Portfolio not found'}</p>
-        <Link to="/" style={{ color: primary, textDecoration: 'none', marginTop: '1rem', opacity: 0.6 }}>← Back to home</Link>
-      </div>
-    );
+    return <NotFoundPage />;
   }
-
-  const containerStyle: React.CSSProperties = {
-    width: '100%',
-    maxWidth: isMobile ? '100%' : '60%',
-    margin: '0 auto',
-    padding: isMobile ? '0 1rem' : '0 2rem',
-  };
 
   const projects = portfolio.projects || [];
   const skills = portfolio.skills || [];
@@ -95,12 +105,10 @@ function ThemeContent() {
   return (
     <div
       style={{
-        minHeight: '100vh',
-        paddingTop: '52px',
+        ...sectionStyles.pageBackground,
         background: '#0d1117',
         color: primary,
-        fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-        position: 'relative',
+        fontFamily: sectionStyles.pageBackground?.fontFamily || "'JetBrains Mono', 'Fira Code', monospace",
       }}
     >
       <Header />
@@ -118,89 +126,76 @@ function ThemeContent() {
             rgba(${rgb}, 0.03) 4px
           )`,
           pointerEvents: 'none',
+          willChange: 'transform',
         }}
       />
 
       <header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '4rem 0',
-          position: 'relative',
-        }}
+        style={sectionStyles.heroContainer as React.CSSProperties}
       >
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={reducedMotion ? {} : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          style={containerStyle}
+          transition={{ duration: 0.4, ease: easeOutQuart }}
+          style={{
+            ...sectionStyles.pageContainer,
+            maxWidth: isMobile ? '100%' : (sectionStyles.pageContainer?.maxWidth || '60%'),
+            padding: isMobile ? '0 1rem' : (sectionStyles.pageContainer?.padding || '0 2rem'),
+          } as React.CSSProperties}
         >
           <motion.div
-            initial={{ x: isRTL ? 50 : -50, opacity: 0 }}
+            initial={reducedMotion ? {} : { x: isRTL ? 50 : -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.1, duration: 0.35, ease: easeOutQuart }}
             style={{
-              fontSize: 'clamp(0.75rem, 2vw, 1rem)',
+              ...sectionStyles.heroLabel,
               color: `rgba(${rgb}, 0.5)`,
-              marginBottom: '1rem',
-              letterSpacing: '0.2em',
-            }}
+            } as React.CSSProperties}
           >
             {`> whoami`}
           </motion.div>
 
-          <motion.h1
-            initial={{ y: 20, opacity: 0 }}
+          <motion.div className="flex items-center gap-2">
+                 <motion.h1
+            initial={reducedMotion ? {} : { y: 0, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.15, duration: 0.4, ease: easeOutQuart }}
             style={{
-              fontSize: 'clamp(2rem, 5vw, 4rem)',
-              fontWeight: 700,
-              lineHeight: 1.2,
-              marginBottom: '1.5rem',
+              ...sectionStyles.heroName,
               textShadow: `0 0 20px rgba(${rgb}, 0.5)`,
-            }}
+            } as React.CSSProperties}
           >
             {personalInfo.name}
           </motion.h1>
+          </motion.div>
 
           <motion.p
-            initial={{ y: 20, opacity: 0 }}
+            initial={reducedMotion ? {} : { y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.2, duration: 0.4, ease: easeOutQuart }}
             style={{
-              fontSize: '0.75rem',
-              maxWidth: '75%',
-              fontWeight:'lighter',
+              ...sectionStyles.heroBio,
               color: `rgba(${rgb}, 0.7)`,
-              lineHeight: 1.8,
-              marginBottom: '2rem',
-
-            }}
+              fontWeight: 400,
+            } as React.CSSProperties}
           >
             {personalInfo.bio}
           </motion.p>
 
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
+            initial={reducedMotion ? {} : { y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            style={{
-              display: 'flex',
-              gap: '1rem',
-              flexWrap: 'wrap',
-              width: '60%',
-            }}
+            transition={{ delay: 0.25, duration: 0.4, ease: easeOutQuart }}
+            style={sectionStyles.heroSkillsContainer as React.CSSProperties}
           >
             {skills.map((skill: string) => (
               <span
                 key={skill}
                 style={{
-                  padding: '0.5rem 1rem',
+                  ...sectionStyles.heroSkillPill,
                   border: `1px solid ${primary}`,
-                  fontSize: '0.75rem',
                   background: `rgba(${rgb}, 0.1)`,
-                }}
+                } as React.CSSProperties}
               >
                 {skill}
               </span>
@@ -209,14 +204,13 @@ function ThemeContent() {
 
           {personalInfo.availableForHire && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
+              initial={reducedMotion ? {} : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.35, ease: easeOutQuart }}
               style={{
-                marginTop: '4rem',
-                fontSize: '0.75rem',
+                ...sectionStyles.heroAvailableHire,
                 color: `rgba(${rgb}, 0.4)`,
-              }}
+              } as React.CSSProperties}
             >
               <span style={{ animation: 'blink 1s infinite' }}>▋</span>{' '}
               {t('header.availableForHire')}
@@ -225,16 +219,10 @@ function ThemeContent() {
 
           {contacts.length > 0 && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              style={{
-                marginTop: '1.5rem',
-                display: 'flex',
-                gap: '1.25rem',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-              }}
+              initial={reducedMotion ? {} : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.35, ease: easeOutQuart }}
+              style={sectionStyles.heroContactsContainer as React.CSSProperties}
             >
               {contacts.map((contact: Contact) => {
                 const Icon = getContactIcon(contact.type);
@@ -245,14 +233,9 @@ function ThemeContent() {
                     target={contact.type === 'email' ? '_self' : '_blank'}
                     rel="noopener noreferrer"
                     style={{
+                      ...sectionStyles.heroContactLink,
                       color: `rgba(${rgb}, 0.5)`,
-                      fontSize: '0.8rem',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      transition: 'color 0.2s ease',
-                    }}
+                    } as React.CSSProperties}
                     onMouseEnter={(e) => { e.currentTarget.style.color = `rgba(${rgb}, 1)`; }}
                     onMouseLeave={(e) => { e.currentTarget.style.color = `rgba(${rgb}, 0.5)`; }}
                   >
@@ -266,42 +249,52 @@ function ThemeContent() {
         </motion.div>
       </header>
 
-      <GitHubProvider>
-        <div style={containerStyle}>
-          <GitHubBoard />
-        </div>
-      </GitHubProvider>
+      {portfolio.showGitHubBoard !== false && (
+        <GitHubProvider>
+          <motion.div
+            {...(reducedMotion ? {} : { initial: { opacity: 0, y: 32 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true } } as any)}
+            transition={{ duration: 0.5, ease: easeOutQuart }}
+            style={{
+              ...sectionStyles.gitHubBoardContainer,
+              maxWidth: isMobile ? '100%' : (sectionStyles.gitHubBoardContainer?.maxWidth || '60%'),
+              padding: isMobile ? '0 1rem' : (sectionStyles.gitHubBoardContainer?.padding || '0 2rem'),
+            } as React.CSSProperties}>
+            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: `rgba(${rgb}, 0.4)` }}>▋</div>}>
+              <GitHubBoard />
+            </Suspense>
+          </motion.div>
+        </GitHubProvider>
+      )}
 
       <section
         style={{
-          padding: '4rem 0',
+          ...sectionStyles.projectsContainer,
           borderTop: `1px solid ${primary}30`,
-          position: 'relative',
-        }}
+        } as React.CSSProperties}
       >
         <motion.div
-          initial={{ x: isRTL ? 50 : -50, opacity: 0 }}
+          initial={reducedMotion ? {} : { x: isRTL ? 50 : -50, opacity: 0 }}
           whileInView={{ x: 0, opacity: 1 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.4, ease: easeOutQuart }}
           style={{
-            ...containerStyle,
-            fontSize: '0.75rem',
+            ...sectionStyles.pageContainer,
+            ...sectionStyles.projectsLabel,
+            maxWidth: isMobile ? '100%' : (sectionStyles.pageContainer?.maxWidth || '60%'),
+            padding: isMobile ? '0 1rem' : (sectionStyles.pageContainer?.padding || '0 2rem'),
             color: `rgba(${rgb}, 0.5)`,
-            marginBottom: '2rem',
-            letterSpacing: '0.2em',
-          }}
+          } as React.CSSProperties}
         >
           {`> ls ./${t('projects.title').toLowerCase()}`}
         </motion.div>
 
         <div
           style={{
-            ...containerStyle,
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '1.5rem',
-            alignItems: 'stretch',
-          }}
+            ...sectionStyles.pageContainer,
+            ...sectionStyles.projectsGrid,
+            maxWidth: isMobile ? '100%' : (sectionStyles.pageContainer?.maxWidth || '60%'),
+            padding: isMobile ? '0 1rem' : (sectionStyles.pageContainer?.padding || '0 2rem'),
+          } as React.CSSProperties}
         >
           {projects.map((project, i) => (
             <Link
@@ -315,25 +308,18 @@ function ThemeContent() {
             >
               <motion.div
                 className="project-card"
-                initial={{ opacity: 0, y: 20 }}
+                initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.08, duration: 0.4, ease: easeOutQuart }}
                 viewport={{ once: true }}
-                whileHover={{
+                whileHover={reducedMotion ? {} : {
                   x: isRTL ? -10 : 10,
                 }}
                 style={{
+                  ...sectionStyles.projectCard,
                   border: `1px solid ${primary}30`,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  width: '100%',
-                  position: 'relative',
-                  borderRadius:'12px',
-                  overflow: 'hidden',
-                  ...(project.coverImage ? { padding: 0 } : { padding: '1.5rem' }),
-                }}
+                  ...(project.coverImage ? { padding: 0 } : {}),
+                } as React.CSSProperties}
               >
                 {project.coverImage ? (
                   <div style={{ position: 'relative', width: '100%', height:'100%' , overflow: 'hidden' }}>
@@ -355,25 +341,19 @@ function ThemeContent() {
                     )}
                     <div
                       style={{
-                        position: 'absolute', inset: 0,
+                        ...sectionStyles.projectCardOverlay,
                         background: `linear-gradient(to top, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.7) 50%, transparent 100%)`,
-                        opacity: 0,
-                        transition: 'opacity 0.25s ease',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'flex-end',
-                        padding: '1.5rem',
-                      }}
+                      } as React.CSSProperties}
                       className="card-overlay"
                     >
-                      <h3 style={{ fontSize: '1.25rem', fontWeight:'bold', color: primary }}>
+                      <h3 style={{ ...sectionStyles.projectCardTitle, color: primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as React.CSSProperties}>
                         {project.title}
                       </h3>
-                      <p style={{ fontSize: '0.65rem', fontWeight:'lighter', color: `rgba(${rgb}, 0.8)`, marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <p style={{ ...sectionStyles.projectCardDescription, color: `rgba(${rgb}, 0.8)`, fontWeight: 400, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>
                         {project.description}
                       </p>
                       {project.techStack.length > 0 && (
-                        <span style={{ fontSize: '0.60rem', color: `rgba(${rgb}, 0.6)` }}>
+                        <span style={{ ...sectionStyles.projectCardTechStack, color: `rgba(${rgb}, 0.6)` } as React.CSSProperties}>
                           {'>'} {project.techStack.join(', ')}
                         </span>
                       )}
@@ -384,14 +364,14 @@ function ThemeContent() {
                     <div style={{ fontSize: '3rem', fontWeight: 700, color: `rgba(${rgb}, 0.2)`, marginBottom: '1rem' }}>
                       {project.id || project._id?.slice(-2) || i + 1}
                     </div>
-                    <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: primary }}>
+                    <h3 style={{ ...sectionStyles.projectCardTitle, color: primary, marginBottom: '0.5rem' } as React.CSSProperties}>
                       {project.title}
                     </h3>
-                    <p style={{ fontSize: '0.875rem', color: `rgba(${rgb}, 0.6)`, marginBottom: '1rem', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <p style={{ ...sectionStyles.projectCardDescription, color: `rgba(${rgb}, 0.6)`, fontSize: '0.875rem' } as React.CSSProperties}>
                       {project.description}
                     </p>
                     {project.techStack.length > 0 && (
-                      <span style={{ fontSize: '0.75rem', color: `rgba(${rgb}, 0.5)` }}>
+                      <span style={{ ...sectionStyles.projectCardTechStack, color: `rgba(${rgb}, 0.5)` } as React.CSSProperties}>
                         {'>'} {project.techStack.join(', ')}
                       </span>
                     )}
@@ -411,6 +391,7 @@ function ThemeContent() {
         .project-card:hover .card-overlay {
           opacity: 1 !important;
         }
+        ${rawCss}
       `}</style>
     </div>
   );

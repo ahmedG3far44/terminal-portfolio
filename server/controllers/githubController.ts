@@ -3,6 +3,9 @@ import { fetchContributions, fetchRepos, fetchReadme } from '../utils/github';
 import { env } from '../configs/env';
 import { User } from '../models/User';
 import { AuthRequest } from '../middlewares/auth';
+import { get as cacheGet, set as cacheSet } from '../utils/cache';
+
+const CACHE_TTL = 10 * 60 * 1000;
 
 async function getUserToken(req: AuthRequest): Promise<string | null> {
   if (!req.user) return null;
@@ -14,7 +17,15 @@ export async function getContributions(req: AuthRequest, res: Response) {
   try {
     const accessToken = await getUserToken(req);
     const username = req.user?.githubUsername || env.GITHUB_USERNAME;
+    const cacheKey = `github:contributions:${username}`;
+
+    const cached = cacheGet<object>(cacheKey);
+    if (cached) {
+      return res.json({ success: true, data: cached, cached: true });
+    }
+
     const data = await fetchContributions(username, accessToken || undefined);
+    cacheSet(cacheKey, data, CACHE_TTL);
     res.json({ success: true, data });
   } catch (err: any) {
     if (err.message?.includes('Bad credentials') || err.message?.includes('401')) {

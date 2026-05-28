@@ -8,7 +8,7 @@ import {
 import { http } from '../services/http';
 import { useAuth } from './AuthContext';
 import { useQuery, useMutation } from '../hooks/useQuery';
-import type { Portfolio, PersonalInfo, Project, Contact } from '../types';
+import type { Portfolio, PersonalInfo, Project, Contact, PortfolioCustomization } from '../types';
 
 interface AdminContextType {
   data: Portfolio | null;
@@ -26,6 +26,7 @@ interface AdminContextType {
   deleteContact: (id: string) => Promise<void>;
   migrateSocialFields: () => Promise<void>;
   resetData: () => Promise<void>;
+  updateCustomization: (customization: PortfolioCustomization) => Promise<void>;
   saving: boolean;
 }
 
@@ -163,6 +164,16 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     }
   }, [portfolioQuery]);
 
+  const updateCustomization = useCallback(async (customization: PortfolioCustomization) => {
+    setSaving(true);
+    try {
+      await http.put('/portfolio', { customization });
+      portfolioQuery.refetch();
+    } finally {
+      setSaving(false);
+    }
+  }, [portfolioQuery]);
+
   const resetData = useCallback(async () => {
     setSaving(true);
     try {
@@ -191,6 +202,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         deleteContact,
         migrateSocialFields,
         resetData,
+        updateCustomization,
         saving,
       }}
     >

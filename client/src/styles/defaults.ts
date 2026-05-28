@@ -1,0 +1,150 @@
+import type { SectionStyles } from '../types';
+
+export const defaultSectionStyles: Record<string, Record<string, string>> = {
+  pageContainer: {
+    width: '100%',
+    maxWidth: '60%',
+    margin: '0 auto',
+    padding: '0 2rem',
+  },
+  pageBackground: {
+    minHeight: '100vh',
+    paddingTop: '52px',
+    position: 'relative',
+  },
+  heroContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '4rem 0',
+    position: 'relative',
+  },
+  heroLabel: {
+    fontSize: 'clamp(0.75rem, 2vw, 1rem)',
+    marginBottom: '1rem',
+    letterSpacing: '0.2em',
+  },
+  heroName: {
+    fontSize: 'clamp(2rem, 5vw, 4rem)',
+    fontWeight: '700',
+    lineHeight: '1.2',
+    marginBottom: '1.5rem',
+  },
+  heroBio: {
+    fontSize: '0.75rem',
+    maxWidth: '75%',
+    fontWeight: 'lighter',
+    lineHeight: '1.8',
+    marginBottom: '2rem',
+  },
+  heroSkillsContainer: {
+    display: 'flex',
+    gap: '1rem',
+    flexWrap: 'wrap',
+    width: '60%',
+  },
+  heroSkillPill: {
+    padding: '0.5rem 1rem',
+    fontSize: '0.75rem',
+  },
+  heroAvailableHire: {
+    marginTop: '4rem',
+    fontSize: '0.75rem',
+  },
+  heroContactsContainer: {
+    marginTop: '1.5rem',
+    display: 'flex',
+    gap: '1.25rem',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+  },
+  heroContactLink: {
+    fontSize: '0.8rem',
+    textDecoration: 'none',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '0.4rem',
+    transition: 'color 0.2s ease',
+  },
+  gitHubBoardContainer: {
+    width: '100%',
+    maxWidth: '60%',
+    margin: '0 auto',
+    padding: '0 2rem',
+  },
+  projectsContainer: {
+    padding: '4rem 0',
+    position: 'relative',
+  },
+  projectsLabel: {
+    fontSize: '0.75rem',
+    marginBottom: '2rem',
+    letterSpacing: '0.2em',
+  },
+  projectsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '1.5rem',
+    alignItems: 'stretch',
+  },
+  projectCard: {
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    position: 'relative',
+    borderRadius: '12px',
+    overflow: 'hidden',
+    padding: '1.5rem',
+  },
+  projectCardOverlay: {
+    position: 'absolute',
+    inset: '0',
+    opacity: '0',
+    transition: 'opacity 0.25s ease',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    padding: '1.5rem',
+  },
+  projectCardTitle: {
+    fontSize: '1.25rem',
+    fontWeight: 'bold',
+  },
+  projectCardDescription: {
+    fontSize: '0.65rem',
+    fontWeight: 'lighter',
+    marginBottom: '0.5rem',
+    display: '-webkit-box',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  projectCardTechStack: {
+    fontSize: '0.60rem',
+  },
+};
+
+export const sectionLabels: Record<string, string> = {
+  pageContainer: 'Page Container (max-width, padding)',
+  pageBackground: 'Page Background',
+  heroContainer: 'Hero Section Container',
+  heroLabel: 'Hero > whoami Label',
+  heroName: 'Hero Name Heading',
+  heroBio: 'Hero Bio Text',
+  heroSkillsContainer: 'Hero Skills Container',
+  heroSkillPill: 'Hero Skill Pill',
+  heroAvailableHire: 'Hero Available for Hire',
+  heroContactsContainer: 'Hero Contacts Container',
+  heroContactLink: 'Hero Contact Link',
+  gitHubBoardContainer: 'GitHub Board Container',
+  projectsContainer: 'Projects Section Container',
+  projectsLabel: 'Projects > ls Label',
+  projectsGrid: 'Projects Grid',
+  projectCard: 'Project Card',
+  projectCardOverlay: 'Project Card Image Overlay',
+  projectCardTitle: 'Project Card Title',
+  projectCardDescription: 'Project Card Description',
+  projectCardTechStack: 'Project Card Tech Stack',
+};
+
+export const sectionKeys = Object.keys(defaultSectionStyles);

@@ -24,7 +24,7 @@ export async function getPortfolio(req: AuthRequest, res: Response) {
 
 export async function updatePortfolio(req: AuthRequest, res: Response) {
   try {
-    const allowedFields = ['personalInfo', 'skills', 'projects', 'activeTheme'];
+    const allowedFields = ['personalInfo', 'skills', 'projects', 'activeTheme', 'customization', 'showGitHubBoard'];
     const setFields: Record<string, any> = {};
 
     for (const field of allowedFields) {

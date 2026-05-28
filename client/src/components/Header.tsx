@@ -39,8 +39,8 @@ export default function Header() {
           gap: '0.5rem',
         }}
       >
-        <User size={16} />
-        ~/portfolio
+        <img width={40} height={40} src='/icon.svg' alt='' />
+        <span className="text-3xl font-black">Tolio</span>
       </Link>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -49,7 +49,7 @@ export default function Header() {
         ) : isAuthenticated && user ? (
           <>
             <Link
-              to="/admin"
+              to="/dashboard"
               style={{
                 display: 'flex',
                 alignItems: 'center',

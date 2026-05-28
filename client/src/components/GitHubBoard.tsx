@@ -1,3 +1,4 @@
+import { motion, useReducedMotion } from 'framer-motion';
 import { useGitHub } from '../context/GitHubContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -11,12 +12,15 @@ function getHeatColor(count: number, rgb: string): string {
   return `rgba(${rgb}, 0.85)`;
 }
 
+const easeOutQuart = [0.25, 1, 0.5, 1];
+
 export default function GitHubBoard() {
   const { contributions, loading, error } = useGitHub();
   const { colors } = useTheme();
   const { t } = useLanguage();
   const rgb = colors?.rgb || '57, 255, 20';
   const primary = colors?.primary || '#ec4899';
+  const reducedMotion = useReducedMotion();
 
   if (loading) {
     return (
@@ -33,19 +37,7 @@ export default function GitHubBoard() {
     );
   }
 
-  if (error) {
-    return (
-      <div
-        style={{
-          padding: '2rem',
-          textAlign: 'center',
-          color: `rgba(${rgb}, 0.5)`,
-        }}
-      >
-        Failed to load GitHub data
-      </div>
-    );
-  }
+  if (error) return null;
 
   if (!contributions) return null;
 
@@ -87,11 +79,15 @@ export default function GitHubBoard() {
           marginBottom: '2rem',
         }}
       >
-        {visibleCards.map((stat) => {
+        {visibleCards.map((stat, i) => {
           const Icon = stat.icon;
           return (
-            <div
+            <motion.div
               key={stat.label}
+              initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.06, duration: 0.35, ease: easeOutQuart }}
               style={{
                 padding: '1.25rem',
                 border: `1px solid ${primary}20`,
@@ -123,12 +119,16 @@ export default function GitHubBoard() {
               >
                 {stat.label}
               </div>
-            </div>
-          );
-        })}
-      </div>
+              </motion.div>
+            );
+          })}
+        </div>
 
-      <div
+      <motion.div
+        initial={reducedMotion ? {} : { opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, ease: easeOutQuart, delay: 0.15 }}
         style={{
           display: 'flex',
           flexWrap: 'wrap',
@@ -144,12 +144,13 @@ export default function GitHubBoard() {
               height: '10px',
               borderRadius: '2px',
               background: getHeatColor(day.count, rgb),
-              transition: 'all 0.15s',
+              transition: 'background 0.15s',
+              contain: 'strict',
             }}
             title={`${day.date}: ${day.count} contributions`}
           />
         ))}
-      </div>
+      </motion.div>
     </section>
   );
 }

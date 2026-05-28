@@ -3,8 +3,11 @@ import Landing from './pages/Landing';
 import Home from './pages/Home';
 import ProjectDetails from './pages/ProjectDetails';
 import AdminDashboard from './pages/AdminDashboard';
+import LoginPage from './pages/LoginPage';
 import SuperAdminLogin from './pages/SuperAdminLogin';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
+import NotFoundPage from './pages/NotFoundPage';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
 export default function App() {
   return (
@@ -15,9 +18,11 @@ export default function App() {
         <Route path="/:username" element={<Home />} />
         <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="/:username/project/:id" element={<ProjectDetails />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/super/login" element={<SuperAdminLogin />} />
-        <Route path="/admin/super" element={<SuperAdminDashboard />} />
+        <Route path="/dashboard" element={<AdminDashboard />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin/login" element={<SuperAdminLogin />} />
+        <Route path="/admin" element={<ProtectedAdminRoute><SuperAdminDashboard /></ProtectedAdminRoute>} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );

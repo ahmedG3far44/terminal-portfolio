@@ -40,7 +40,7 @@ export async function getInsights(_req: Request, res: Response) {
 
 export async function getUsers(req: Request, res: Response) {
   try {
-    const { search, page = '1', limit = '20' } = req.query;
+    const { search, status, page = '1', limit = '20' } = req.query;
     const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
     const limitNum = Math.min(100, Math.max(1, parseInt(limit as string, 10) || 20));
     const skip = (pageNum - 1) * limitNum;
@@ -52,6 +52,8 @@ export async function getUsers(req: Request, res: Response) {
         { email: { $regex: search, $options: 'i' } },
       ];
     }
+    if (status === 'active') query.isActive = true;
+    else if (status === 'blocked') query.isActive = false;
 
     const [users, total] = await Promise.all([
       User.find(query).select('-__v').sort({ createdAt: -1 }).skip(skip).limit(limitNum),

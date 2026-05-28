@@ -34,7 +34,7 @@ export default function SuperAdminLogin() {
       if (!res.ok) throw new Error(json.error || 'Login failed');
 
       localStorage.setItem('admin-token', json.data.token);
-      navigate('/admin/super');
+      navigate('/admin');
     } catch (err: any) {
       setError(err.message);
     } finally {

@@ -17,7 +17,7 @@ export function redirectToGitHub(_req: Request, res: Response) {
 export async function githubCallback(req: Request, res: Response) {
   const { code } = req.query;
   if (!code || typeof code !== 'string') {
-    return res.redirect(`${env.CLIENT_URL}/admin?error=missing_code`);
+    return res.redirect(`${env.CLIENT_URL}/login?error=missing_code`);
   }
 
   try {
@@ -33,7 +33,7 @@ export async function githubCallback(req: Request, res: Response) {
 
     const tokenData: any = await tokenRes.json();
     if (tokenData.error) {
-      return res.redirect(`${env.CLIENT_URL}/admin?error=${tokenData.error}`);
+      return res.redirect(`${env.CLIENT_URL}/login?error=${tokenData.error}`);
     }
 
     const accessToken = tokenData.access_token as string;
@@ -82,7 +82,7 @@ export async function githubCallback(req: Request, res: Response) {
       hasToken: true,
     });
 
-    res.redirect(`${env.CLIENT_URL}/admin?token=${token}`);
+    res.redirect(`${env.CLIENT_URL}/dashboard?token=${token}`);
   } catch (err: any) {
     console.error('GitHub OAuth error:', err);
     res.redirect(`${env.CLIENT_URL}/admin?error=auth_failed`);

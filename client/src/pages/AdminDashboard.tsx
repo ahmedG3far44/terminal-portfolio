@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
@@ -9,10 +9,12 @@ import { GitHubProvider } from '../context/GitHubContext';
 import {
   FolderKanban, GitBranch, Wrench, User, Menu, X, Home, Loader2,
   Plus, Pencil, Trash2, Check, Star, GitFork, LucideLogOut, Link as LinkIcon,
+  Paintbrush,
 } from 'lucide-react';
 import { http } from '../services/http';
 import { getContactIcon } from '../components/ContactIcons';
-import type { Project, PersonalInfo, Contact } from '../types';
+import CustomizationEditor from '../components/admin/CustomizationEditor';
+import type { Project, PersonalInfo, Contact, PortfolioCustomization } from '../types';
 
 const COLORS = {
   background: '#09090b',
@@ -352,7 +354,7 @@ function LoginScreen() {
     const token = params.get('token');
     if (token) {
       localStorage.setItem('auth-token', token);
-      window.location.replace('/admin');
+      window.location.replace('/dashboard');
     } else {
       setCheckingToken(false);
     }
@@ -399,6 +401,7 @@ function SidebarContent({
     { id: 'skills', label: t('admin.skills') || 'Skills', icon: Wrench },
     { id: 'personalInfo', label: t('admin.personalInfo') || 'Personal Info', icon: User },
     { id: 'contacts', label: t('contact.title') || 'Contacts', icon: LinkIcon },
+    { id: 'customize', label: 'Customize UI', icon: Paintbrush },
   ];
 
   return (
@@ -444,7 +447,7 @@ function SidebarContent({
 }
 
 function AdminContent() {
-  const { data, loading, error, refetch, updatePersonalInfo, addProject, updateProject, deleteProject, addSkill, deleteSkill, addContact, updateContact, deleteContact, migrateSocialFields, saving } = useAdmin();
+  const { data, loading, error, refetch, updatePersonalInfo, addProject, updateProject, deleteProject, addSkill, deleteSkill, addContact, updateContact, deleteContact, migrateSocialFields, updateCustomization, saving } = useAdmin();
   const { user } = useAuth();
   const { t } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -526,6 +529,18 @@ function AdminContent() {
               onDelete={deleteContact}
               onMigrate={migrateSocialFields}
               t={t}
+              saving={saving}
+            />
+          )}
+          {activeTab === 'customize' && data && (
+            <CustomizeTab
+              customization={data.customization}
+              showGitHubBoard={data.showGitHubBoard}
+              onSave={updateCustomization}
+              onToggleGitHubBoard={async (v) => {
+                await http.put('/portfolio', { showGitHubBoard: v });
+                refetch();
+              }}
               saving={saving}
             />
           )}
@@ -1139,6 +1154,122 @@ function ContactsTab({
           })}
         </div>
       )}
+    </div>
+  );
+}
+
+function CustomizeTab({
+  customization,
+  showGitHubBoard,
+  onSave,
+  onToggleGitHubBoard,
+  saving,
+}: {
+  customization?: PortfolioCustomization;
+  showGitHubBoard?: boolean;
+  onSave: (c: PortfolioCustomization) => Promise<void>;
+  onToggleGitHubBoard: (v: boolean) => Promise<void>;
+  saving: boolean;
+}) {
+  const [local, setLocal] = useState<PortfolioCustomization>(() => ({
+    styles: {},
+    rawCss: '',
+    ...customization,
+  }));
+  const [dirty, setDirty] = useState(false);
+  const [savingLocal, setSavingLocal] = useState(false);
+  const [togglingGH, setTogglingGH] = useState(false);
+
+  useEffect(() => {
+    setLocal({
+      styles: {},
+      rawCss: '',
+      ...customization,
+    });
+    setDirty(false);
+  }, [customization]);
+
+  const handleChange = useCallback((updated: PortfolioCustomization) => {
+    setLocal(updated);
+    setDirty(true);
+  }, []);
+
+  const handleSave = async () => {
+    setSavingLocal(true);
+    try {
+      await onSave(local);
+      setDirty(false);
+    } finally {
+      setSavingLocal(false);
+    }
+  };
+
+  const handleToggleGH = async () => {
+    setTogglingGH(true);
+    try {
+      await onToggleGitHubBoard(!showGitHubBoard);
+    } finally {
+      setTogglingGH(false);
+    }
+  };
+
+  const isBusy = savingLocal || saving;
+
+  return (
+    <div>
+      <div style={{ background: COLORS.card, border: `1px solid ${COLORS.border}`, borderRadius: '0.75rem', padding: '1rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <div style={{ fontSize: '0.875rem', fontWeight: 500, color: COLORS.foreground, marginBottom: '0.25rem' }}>
+            GitHub Contributions Board
+          </div>
+          <div style={{ fontSize: '0.75rem', color: COLORS.mutedForeground }}>
+            Show GitHub contribution stats and heatmap on your portfolio
+          </div>
+        </div>
+        <button
+          onClick={handleToggleGH}
+          disabled={togglingGH}
+          style={{
+            position: 'relative',
+            width: '44px',
+            height: '24px',
+            borderRadius: '12px',
+            border: 'none',
+            cursor: togglingGH ? 'default' : 'pointer',
+            background: showGitHubBoard ? '#22c55e' : COLORS.muted,
+            transition: 'background 0.2s',
+            flexShrink: 0,
+          }}
+        >
+          <div style={{
+            position: 'absolute',
+            top: '2px',
+            left: showGitHubBoard ? '22px' : '2px',
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            background: '#fafafa',
+            transition: 'left 0.2s',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+          }} />
+        </button>
+      </div>
+
+      <CustomizationEditor value={local} onChange={handleChange} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: `1px solid ${COLORS.border}` }}>
+        <button
+          onClick={handleSave}
+          disabled={!dirty || isBusy}
+          style={{
+            ...btnPrimary,
+            opacity: !dirty || isBusy ? 0.6 : 1,
+          }}
+        >
+          {isBusy ? <Spinner size={14} /> : null}
+          {isBusy ? 'Saving...' : 'Save Customization'}
+        </button>
+        {!savingLocal && saving && <Spinner size={14} />}
+      </div>
     </div>
   );
 }

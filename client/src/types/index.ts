@@ -41,6 +41,34 @@ export interface Project {
   coverImage: string | null;
 }
 
+export interface SectionStyles {
+  pageContainer?: Record<string, string>;
+  pageBackground?: Record<string, string>;
+  heroContainer?: Record<string, string>;
+  heroLabel?: Record<string, string>;
+  heroName?: Record<string, string>;
+  heroBio?: Record<string, string>;
+  heroSkillsContainer?: Record<string, string>;
+  heroSkillPill?: Record<string, string>;
+  heroAvailableHire?: Record<string, string>;
+  heroContactsContainer?: Record<string, string>;
+  heroContactLink?: Record<string, string>;
+  gitHubBoardContainer?: Record<string, string>;
+  projectsContainer?: Record<string, string>;
+  projectsLabel?: Record<string, string>;
+  projectsGrid?: Record<string, string>;
+  projectCard?: Record<string, string>;
+  projectCardOverlay?: Record<string, string>;
+  projectCardTitle?: Record<string, string>;
+  projectCardDescription?: Record<string, string>;
+  projectCardTechStack?: Record<string, string>;
+}
+
+export interface PortfolioCustomization {
+  styles?: SectionStyles;
+  rawCss?: string;
+}
+
 export interface Portfolio {
   _id?: string;
   personalInfo: PersonalInfo;
@@ -48,6 +76,8 @@ export interface Portfolio {
   projects: Project[];
   contacts: Contact[];
   activeTheme?: string;
+  customization?: PortfolioCustomization;
+  showGitHubBoard?: boolean;
 }
 
 export interface Theme {
