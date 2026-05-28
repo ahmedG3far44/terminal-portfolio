@@ -4,8 +4,8 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Terminal, Shield, Palette, Globe, Database, GitBranch, LayoutDashboard, Code2, LogIn, User, Loader2 } from 'lucide-react';
-import Logo from '@/components/Logo';
+import { Terminal, GitBranch, LayoutDashboard, Shield, Palette, Globe, Database, Code2, LogIn, User, Loader2, ArrowRight } from 'lucide-react';
+import TerminalWidget from '../components/TerminalWidget';
 
 const easeOut = [0.25, 1, 0.5, 1];
 
@@ -14,112 +14,107 @@ const features = [
     icon: Terminal,
     title: 'Terminal Portfolio',
     desc: 'A unique terminal-themed portfolio with command-line aesthetics, project cards, and README rendering.',
-    spotlight: true,
+    span: 'wide',
   },
   {
     icon: GitBranch,
     title: 'GitHub Integration',
     desc: 'Live contribution heatmap, stats, and repository browser all proxied through the server for security.',
-    spotlight: true,
+    span: 'wide',
   },
   {
     icon: LayoutDashboard,
     title: 'Admin Dashboard',
     desc: 'Full CRUD for projects, skills, and personal info. GitHub OAuth login with JWT session management.',
+    span: 'narrow',
   },
   {
     icon: Shield,
     title: 'Super Admin Panel',
-    desc: 'Platform-wide insights, user management (search, block/activate), and color theme CRUD.',
+    desc: 'Platform-wide insights, user management, and color theme CRUD.',
+    span: 'narrow',
   },
   {
     icon: Palette,
     title: 'Custom Themes',
     desc: 'DB-driven color themes managed by super admin. Users pick from available accent colors.',
+    span: 'narrow',
   },
   {
     icon: Globe,
     title: 'Internationalization',
     desc: 'English/Arabic support with RTL layout, keyboard shortcut toggle, and JSON-based translations.',
+    span: 'tall',
   },
   {
     icon: Database,
     title: 'MongoDB Backend',
     desc: 'Express and Mongoose API server with per-user portfolios, GitHub OAuth users, and theme collections.',
+    span: 'narrow',
   },
   {
     icon: Code2,
     title: 'TypeScript Monorepo',
     desc: 'Shared types between client and server. Custom fetch interceptor and query hooks.',
+    span: 'narrow',
   },
 ];
 
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.06 } },
-};
+const techCategories = [
+  { label: 'Frontend', items: ['React', 'TypeScript', 'Vite', 'Framer Motion'] },
+  { label: 'Backend', items: ['Express', 'Node.js', 'Mongoose'] },
+  { label: 'Infra', items: ['MongoDB', 'JWT', 'GitHub API'] },
+];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: easeOut } },
-};
-
-function FeatureCard({ icon: Icon, title, desc, i, spotlight, tokens }: { icon: any; title: string; desc: string; i: number; spotlight?: boolean; tokens: any }) {
+function FeatureCard({ icon: Icon, title, desc, span, i, tokens }: { icon: any; title: string; desc: string; span: string; i: number; tokens: any }) {
   const prefersReducedMotion = useReducedMotion();
   const [hovered, setHovered] = useState(false);
 
+  const isTall = span === 'tall';
+  const isWide = span === 'wide';
+
   return (
     <motion.div
-      variants={fadeUp}
-      initial="hidden"
-      whileInView="visible"
+      initial={prefersReducedMotion ? {} : { opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
-      transition={{ delay: i * 0.06 }}
+      transition={{ delay: i * 0.05, duration: 0.4, ease: easeOut }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
         background: tokens.surface,
         border: `1px solid ${hovered ? tokens.borderSubtle : tokens.borderBase}`,
-        borderRadius: spotlight ? '1rem' : '0.75rem',
-        padding: spotlight ? '2rem' : '1.5rem',
-        transition: prefersReducedMotion ? 'none' : 'border-color 0.3s ease, transform 0.3s ease',
-        ...(hovered && !prefersReducedMotion ? { transform: 'translateY(-3px)' } : {}),
-        overflowWrap: 'break-word',
-        wordBreak: 'break-word',
+        borderRadius: '1rem',
+        padding: isTall ? '2rem 1.5rem' : '1.5rem',
+        transition: prefersReducedMotion ? 'none' : 'border-color 0.3s ease',
+        display: 'flex',
+        flexDirection: isTall ? 'column' : 'column',
+        gap: '0.75rem',
       }}
     >
-      <motion.div
-        animate={hovered && !prefersReducedMotion ? { scale: 1.08 } : { scale: 1 }}
-        transition={{ duration: 0.3, ease: easeOut }}
+      <div
         style={{
-          width: spotlight ? '48px' : '40px',
-          height: spotlight ? '48px' : '40px',
+          width: '36px',
+          height: '36px',
           borderRadius: '0.5rem',
           background: `rgba(${tokens.accentRgb}, 0.08)`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: '1rem',
           color: tokens.accent,
+          flexShrink: 0,
         }}
       >
-        <Icon size={spotlight ? 22 : 20} />
-      </motion.div>
-      <h3 style={{
-        fontSize: spotlight ? '1.1rem' : '1rem',
-        fontWeight: 600,
-        marginBottom: '0.5rem',
-        color: tokens.fg,
-        overflowWrap: 'break-word',
-        wordBreak: 'break-word',
-      }}>{title}</h3>
-      <p style={{
-        fontSize: '0.85rem',
-        color: tokens.textMuted,
-        lineHeight: 1.7,
-        overflowWrap: 'break-word',
-        wordBreak: 'break-word',
-      }}>{desc}</p>
+        <Icon size={18} />
+      </div>
+      <div>
+        <h3 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.35rem', color: tokens.fg }}>
+          {title}
+        </h3>
+        <p style={{ fontSize: '0.8rem', color: tokens.textMuted, lineHeight: 1.6 }}>
+          {desc}
+        </p>
+      </div>
     </motion.div>
   );
 }
@@ -231,7 +226,8 @@ export default function Landing() {
           whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
           style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: tokens.accent, fontWeight: 700, fontSize: '1.1rem' }}
         >
-          <Logo/>
+          <Terminal size={22} />
+          <span>terminal-portfolio</span>
         </motion.div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           {authLoading ? (
@@ -285,73 +281,73 @@ export default function Landing() {
         </div>
       </motion.nav>
 
-      <main style={{ position: 'relative', zIndex: 1, maxWidth: '1120px', margin: '0 auto', padding: '6rem 2rem 4rem', direction: isRTL ? 'rtl' : 'ltr' }}>
-        <motion.div
-          initial={prefersReducedMotion ? {} : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, ease: easeOut }}
-          style={{ textAlign: isRTL ? 'right' : 'center', marginBottom: '6rem' }}
-        >
-          <motion.div
-            initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.5, ease: easeOut }}
-            style={{ marginBottom: '1.5rem' }}
-          >
-            <MonoLabel blink accentRgb={tokens.accentRgb} isRTL={isRTL}>{'> cat ./platform/features'}</MonoLabel>
-          </motion.div>
-
-          <motion.h1
-            initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6, ease: easeOut }}
+      <main style={{ position: 'relative', zIndex: 1, maxWidth: '1120px', margin: '0 auto', padding: '5rem 2rem 3rem', direction: isRTL ? 'rtl' : 'ltr' }}>
+          <div
+            className="hero-grid"
             style={{
-              fontSize: 'clamp(2.25rem, 5vw, 3.75rem)',
-              fontWeight: 800,
-              color: tokens.fg,
-              marginBottom: '1.25rem',
-              lineHeight: 1.05,
-              letterSpacing: '-0.02em',
-              overflowWrap: 'break-word',
-              wordBreak: 'break-word',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '3rem',
+              marginBottom: '5rem',
             }}
           >
-            Full-Stack{' '}
-            <span style={{
-              color: tokens.accent,
-              textShadow: `0 0 20px rgba(${tokens.accentRgb}, 0.4)`,
-              animation: prefersReducedMotion ? 'none' : 'glow-pulse 3s ease-in-out infinite',
-            }}>
-              Portfolio
-            </span>{' '}
-            Platform
-          </motion.h1>
+            <div>
+              <motion.div
+                initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.5, ease: easeOut }}
+                style={{ marginBottom: '1.5rem' }}
+              >
+                <MonoLabel blink accentRgb={tokens.accentRgb} isRTL={isRTL}>{'> cat ./platform/features'}</MonoLabel>
+              </motion.div>
 
-          <motion.p
-            initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45, duration: 0.5, ease: easeOut }}
-            style={{
-              fontSize: '1rem',
-              color: tokens.textMuted,
-              maxWidth: '600px',
-              margin: '0 auto 2.5rem',
-              lineHeight: 1.8,
-              overflowWrap: 'break-word',
-              wordBreak: 'break-word',
-              textAlign: isRTL ? 'right' : 'center',
-            }}
-          >
-            A modern, terminal-themed portfolio application with GitHub OAuth, MongoDB persistence,
-            super admin management, and real-time GitHub integration all built with TypeScript.
-          </motion.p>
+              <motion.h1
+                initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.6, ease: easeOut }}
+                style={{
+                  fontSize: 'clamp(2.25rem, 5vw, 3.75rem)',
+                  fontWeight: 800,
+                  color: tokens.fg,
+                  marginBottom: '1.25rem',
+                  lineHeight: 1.05,
+                  letterSpacing: '-0.02em',
+                  maxWidth: '780px',
+                }}
+              >
+                Full-Stack{' '}
+                <span style={{
+                  color: tokens.accent,
+                  textShadow: `0 0 20px rgba(${tokens.accentRgb}, 0.4)`,
+                  animation: prefersReducedMotion ? 'none' : 'glow-pulse 3s ease-in-out infinite',
+                }}>
+                  Portfolio
+                </span>{' '}
+                Platform
+              </motion.h1>
 
-          <motion.div
-            initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.5, ease: easeOut }}
-            style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}
-          >
+              <motion.p
+                initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45, duration: 0.5, ease: easeOut }}
+                style={{
+                  fontSize: '1rem',
+                  color: tokens.textMuted,
+                  maxWidth: '600px',
+                  marginBottom: '2.5rem',
+                  lineHeight: 1.8,
+                }}
+              >
+                A terminal-themed portfolio with GitHub OAuth, MongoDB persistence,
+                super admin management, and live GitHub integration. Built with TypeScript.
+              </motion.p>
+
+              <motion.div
+                initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.5, ease: easeOut }}
+                style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}
+              >
             {isAuthenticated && user ? (
               <motion.div
                 whileHover={prefersReducedMotion ? {} : { scale: 1.03 }}
@@ -427,7 +423,21 @@ export default function Landing() {
               <GitBranch size={18} />
               Source Code
             </motion.a>
-          </motion.div>
+            </motion.div>
+            </div>
+            <div style={{ position: 'relative' }}>
+              <TerminalWidget accentRgb={tokens.accentRgb} tokens={tokens} />
+            </div>
+          </div>
+
+        <motion.div
+          initial={prefersReducedMotion ? {} : { opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, ease: easeOut }}
+          style={{ marginBottom: '3rem' }}
+        >
+          <MonoLabel accentRgb={tokens.accentRgb} isRTL={isRTL}>{'> ls ./features'}</MonoLabel>
         </motion.div>
 
         <motion.div
@@ -435,33 +445,22 @@ export default function Landing() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4, ease: easeOut }}
-          style={{ marginBottom: '1.5rem' }}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '0.75rem',
+            marginBottom: '6rem',
+          }}
         >
-          <MonoLabel accentRgb={tokens.accentRgb} isRTL={isRTL}>{'> ls ./features'}</MonoLabel>
-        </motion.div>
-
-        <motion.div
-          variants={prefersReducedMotion ? {} : stagger}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-40px' }}
-          style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
-        >
-          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '1rem' }}>
-            {features.slice(0, 2).map((f, i) => (
-              <FeatureCard key={f.title} {...f} i={i} spotlight tokens={tokens} />
-            ))}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
-            {features.slice(2, 5).map((f, i) => (
-              <FeatureCard key={f.title} {...f} i={i + 2} tokens={tokens} />
-            ))}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
-            {features.slice(5, 8).map((f, i) => (
-              <FeatureCard key={f.title} {...f} i={i + 5} tokens={tokens} />
-            ))}
-          </div>
+          {features.map((f, i) => {
+            const colSpan = f.span === 'wide' ? 'span 2' : f.span === 'tall' ? 'span 1' : 'span 1';
+            const rowSpan = f.span === 'tall' ? 'span 2' : 'span 1';
+            return (
+              <div key={f.title} style={{ gridColumn: colSpan, gridRow: rowSpan }}>
+                <FeatureCard {...f} i={i} tokens={tokens} />
+              </div>
+            );
+          })}
         </motion.div>
 
         <motion.div
@@ -469,37 +468,47 @@ export default function Landing() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.5, ease: easeOut }}
-          style={{ marginTop: '4rem', borderTop: `1px solid ${tokens.borderBase}`, paddingTop: '2rem' }}
+          style={{
+            borderTop: `1px solid ${tokens.borderBase}`,
+            paddingTop: '3rem',
+          }}
         >
-          <div style={{ marginBottom: '1.25rem' }}>
-            <MonoLabel accentRgb={tokens.accentRgb} isRTL={isRTL}>{'> Tech Stack'}</MonoLabel>
+          <div style={{ marginBottom: '2rem' }}>
+            <MonoLabel accentRgb={tokens.accentRgb} isRTL={isRTL}>{'> echo $TECH_STACK'}</MonoLabel>
           </div>
-          <motion.div
-            variants={prefersReducedMotion ? {} : { visible: { transition: { staggerChildren: 0.04 } } }}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}
-          >
-            {['React', 'TypeScript', 'Express', 'MongoDB', 'Mongoose', 'JWT', 'Vite', 'Framer Motion', 'GitHub API'].map((tech) => (
-              <motion.span
-                key={tech}
-                variants={prefersReducedMotion ? {} : { hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: easeOut } } }}
-                style={{
-                  padding: '0.4rem 0.8rem',
-                  border: `1px solid ${tokens.borderBase}`,
-                  borderRadius: '0.375rem',
-                  fontSize: '0.8rem',
-                  color: tokens.textMuted,
-                  transition: prefersReducedMotion ? 'none' : 'border-color 0.2s ease, color 0.2s ease',
-                }}
-                onMouseEnter={(e) => { if (!prefersReducedMotion) { e.currentTarget.style.borderColor = tokens.borderSubtle; e.currentTarget.style.color = tokens.fg; } }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = tokens.borderBase; e.currentTarget.style.color = tokens.textMuted; }}
-              >
-                {tech}
-              </motion.span>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
+            {techCategories.map((cat) => (
+              <div key={cat.label}>
+                <div style={{
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '0.65rem',
+                  color: `rgba(${tokens.accentRgb}, 0.4)`,
+                  letterSpacing: '0.15em',
+                  marginBottom: '0.75rem',
+                }}>
+                  {'>'} {cat.label}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                  {cat.items.map((tech) => (
+                    <div
+                      key={tech}
+                      style={{
+                        padding: '0.5rem 0.75rem',
+                        border: `1px solid ${tokens.borderBase}`,
+                        borderRadius: '0.375rem',
+                        fontSize: '0.8rem',
+                        color: tokens.textMuted,
+                        fontFamily: "'JetBrains Mono', monospace",
+                      }}
+                    >
+                      {tech}
+                    </div>
+                  ))}
+                </div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </motion.div>
       </main>
 
@@ -520,6 +529,24 @@ export default function Landing() {
       >
         Built with TypeScript and React &middot; {new Date().getFullYear()}
       </motion.footer>
+
+      <style>{`
+        @keyframes cursor-blink {
+          0%, 50% { opacity: 1; }
+          51%, 100% { opacity: 0; }
+        }
+        @keyframes term-cursor {
+          0%, 50% { opacity: 1; }
+          51%, 100% { opacity: 0; }
+        }
+        @keyframes glow-pulse {
+          0%, 100% { text-shadow: 0 0 20px rgba(${tokens.accentRgb}, 0.4); }
+          50% { text-shadow: 0 0 40px rgba(${tokens.accentRgb}, 0.6), 0 0 60px rgba(${tokens.accentRgb}, 0.2); }
+        }
+        @media (max-width: 768px) {
+          .hero-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }

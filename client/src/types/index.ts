@@ -144,3 +144,63 @@ export interface PaginatedResponse<T> {
   page: number;
   limit: number;
 }
+
+
+// landing page 
+
+export type PersonaId = 'developer' | 'designer' | 'product-manager' | 'marketer';
+
+export interface PersonaInfo {
+  id: PersonaId;
+  name: string;
+  role: string;
+  description: string;
+  accentClass: string;
+  borderColor: string;
+  themeLabel: string;
+}
+
+export interface CustomHeroConfig {
+  developer: {
+    commandLine: string;
+    titleFirstPart: string;
+    titleHighlight: string;
+    titleLastPart: string;
+    description: string;
+    primaryCta: string;
+    secondaryCta: string;
+    showFiles: boolean;
+  };
+  designer: {
+    badgeText: string;
+    titleHighlight: string;
+    titleNormal: string;
+    description: string;
+    primaryCta: string;
+    secondaryCta: string;
+    activeCanvasColor: string;
+    canvasShape: 'circle' | 'square' | 'triangle' | 'star';
+  };
+  'product-manager': {
+    metricBadge: string;
+    titleHighlight: string;
+    titleNormal: string;
+    description: string;
+    primaryCta: string;
+    secondaryCta: string;
+    showRoiCalculator: boolean;
+    initialTraffic: number;
+    initialCvRate: number; // in percent
+  };
+  marketer: {
+    topBadge: string;
+    titleFirstPart: string;
+    titleHighlight: string;
+    titleLastPart: string;
+    description: string;
+    primaryCta: string;
+    secondaryCta: string;
+    socialProofCount: string;
+    pricingTier: 'starter' | 'pro' | 'enterprise';
+  };
+}
