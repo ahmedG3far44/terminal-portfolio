@@ -1,22 +1,16 @@
 import { Response } from 'express';
 import { fetchContributions, fetchRepos, fetchReadme } from '../utils/github';
-import { env } from '../configs/env';
-import { User } from '../models/User';
 import { AuthRequest } from '../middlewares/auth';
 import { get as cacheGet, set as cacheSet } from '../utils/cache';
 
 const CACHE_TTL = 10 * 60 * 1000;
 
-async function getUserToken(req: AuthRequest): Promise<string | null> {
-  if (!req.user) return null;
-  const user = await User.findById(req.user.userId).select('githubAccessToken');
-  return user?.githubAccessToken || null;
-}
-
 export async function getContributions(req: AuthRequest, res: Response) {
   try {
-    const accessToken = await getUserToken(req);
-    const username = req.user?.githubUsername || env.GITHUB_USERNAME;
+    if (!req.user?.githubUsername || !req.user?.githubToken) {
+      return res.status(401).json({ success: false, error: 'Authentication required. Please login with GitHub.', needsReauth: true });
+    }
+    const { githubUsername: username, githubToken: accessToken } = req.user;
     const cacheKey = `github:contributions:${username}`;
 
     const cached = cacheGet<object>(cacheKey);
@@ -24,7 +18,7 @@ export async function getContributions(req: AuthRequest, res: Response) {
       return res.json({ success: true, data: cached, cached: true });
     }
 
-    const data = await fetchContributions(username, accessToken || undefined);
+    const data = await fetchContributions(username, accessToken);
     cacheSet(cacheKey, data, CACHE_TTL);
     res.json({ success: true, data });
   } catch (err: any) {
@@ -37,11 +31,10 @@ export async function getContributions(req: AuthRequest, res: Response) {
 
 export async function getRepos(req: AuthRequest, res: Response) {
   try {
-    const accessToken = await getUserToken(req);
-    if (!accessToken) {
+    if (!req.user?.githubToken) {
       return res.status(401).json({ success: false, error: 'GitHub token not found. Please login again.', needsReauth: true });
     }
-    const username = req.user?.githubUsername || env.GITHUB_USERNAME;
+    const { githubUsername: username, githubToken: accessToken } = req.user;
     const data = await fetchRepos(username, accessToken);
     res.json({ success: true, data });
   } catch (err: any) {
@@ -59,8 +52,10 @@ export async function getReadme(req: AuthRequest, res: Response) {
   }
 
   try {
-    const accessToken = await getUserToken(req);
-    const content = await fetchReadme(owner, repo, accessToken || undefined);
+    if (!req.user?.githubToken) {
+      return res.status(401).json({ success: false, error: 'Authentication required. Please login with GitHub.', needsReauth: true });
+    }
+    const content = await fetchReadme(owner, repo, req.user.githubToken);
     if (content === null) {
       return res.status(404).json({ success: false, error: 'README not found' });
     }

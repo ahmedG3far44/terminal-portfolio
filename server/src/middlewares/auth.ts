@@ -5,6 +5,7 @@ export interface AuthRequest extends Request {
   user?: {
     userId: string;
     githubUsername: string;
+    githubToken: string | null;
     role: 'user';
     hasToken: boolean;
   };

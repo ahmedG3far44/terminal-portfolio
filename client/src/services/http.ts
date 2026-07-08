@@ -1,4 +1,5 @@
-const BASE_URL = '/api';
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "/api";
 
 interface HttpOptions {
   params?: Record<string, string | number | undefined>;
@@ -6,7 +7,7 @@ interface HttpOptions {
 }
 
 function getToken(): string | null {
-  return localStorage.getItem('auth-token');
+  return localStorage.getItem("auth-token");
 }
 
 export class HttpError extends Error {
@@ -17,7 +18,7 @@ export class HttpError extends Error {
     super(message);
     this.status = status;
     this.needsReauth = needsReauth;
-    this.name = 'HttpError';
+    this.name = "HttpError";
   }
 }
 
@@ -31,14 +32,14 @@ async function request<T>(
   const headers: Record<string, string> = {};
 
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   let fullUrl = `${BASE_URL}${url}`;
 
   if (options?.params) {
     const filtered = Object.entries(options.params).filter(
-      ([, v]) => v !== undefined && v !== '',
+      ([, v]) => v !== undefined && v !== "",
     );
     if (filtered.length > 0) {
       const qs = new URLSearchParams(
@@ -54,8 +55,8 @@ async function request<T>(
     signal: options?.signal,
   };
 
-  if (body !== undefined && method !== 'GET' && method !== 'DELETE') {
-    headers['Content-Type'] = 'application/json';
+  if (body !== undefined && method !== "GET" && method !== "DELETE") {
+    headers["Content-Type"] = "application/json";
     fetchOptions.body = JSON.stringify(body);
   }
 
@@ -68,25 +69,33 @@ async function request<T>(
   const json = await res.json();
 
   if (!res.ok) {
-    throw new HttpError(json.error || `HTTP ${res.status}`, res.status, json.needsReauth);
+    throw new HttpError(
+      json.error || `HTTP ${res.status}`,
+      res.status,
+      json.needsReauth,
+    );
   }
 
   return json.data !== undefined ? json.data : json;
 }
 
-async function uploadFile<T>(url: string, file: File, signal?: AbortSignal): Promise<T> {
+async function uploadFile<T>(
+  url: string,
+  file: File,
+  signal?: AbortSignal,
+): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {};
 
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append("file", file);
 
   const res = await fetch(`${BASE_URL}${url}`, {
-    method: 'POST',
+    method: "POST",
     headers,
     signal,
     body: formData,
@@ -95,18 +104,25 @@ async function uploadFile<T>(url: string, file: File, signal?: AbortSignal): Pro
   const json = await res.json();
 
   if (!res.ok) {
-    throw new HttpError(json.error || `HTTP ${res.status}`, res.status, json.needsReauth);
+    throw new HttpError(
+      json.error || `HTTP ${res.status}`,
+      res.status,
+      json.needsReauth,
+    );
   }
 
   return json.data !== undefined ? json.data : json;
 }
 
 export const http = {
-  get: <T>(url: string, opts?: HttpOptions) => request<T>('GET', url, undefined, opts),
+  get: <T>(url: string, opts?: HttpOptions) =>
+    request<T>("GET", url, undefined, opts),
   post: <T>(url: string, body?: unknown, opts?: HttpOptions) =>
-    request<T>('POST', url, body, opts),
+    request<T>("POST", url, body, opts),
   put: <T>(url: string, body?: unknown, opts?: HttpOptions) =>
-    request<T>('PUT', url, body, opts),
-  del: <T>(url: string, opts?: HttpOptions) => request<T>('DELETE', url, undefined, opts),
-  upload: <T>(url: string, file: File, signal?: AbortSignal) => uploadFile<T>(url, file, signal),
+    request<T>("PUT", url, body, opts),
+  del: <T>(url: string, opts?: HttpOptions) =>
+    request<T>("DELETE", url, undefined, opts),
+  upload: <T>(url: string, file: File, signal?: AbortSignal) =>
+    uploadFile<T>(url, file, signal),
 };

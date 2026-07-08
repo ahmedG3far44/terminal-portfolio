@@ -1,12 +1,9 @@
-import { env } from '../configs/env';
-
 const GITHUB_GRAPHQL = 'https://api.github.com/graphql';
 const GITHUB_API = 'https://api.github.com';
 
-function headers(accessToken?: string) {
-  const token = accessToken || env.GITHUB_TOKEN;
+function headers(accessToken: string) {
   return {
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${accessToken}`,
     'Content-Type': 'application/json',
   };
 }
@@ -82,7 +79,7 @@ function calculateStreaks(contributions: { date: string; count: number }[]) {
   return { currentStreak, longestStreak };
 }
 
-export async function fetchContributions(username: string, accessToken?: string) {
+export async function fetchContributions(username: string, accessToken: string) {
   const res = await fetch(GITHUB_GRAPHQL, {
     method: 'POST',
     headers: headers(accessToken),
@@ -112,7 +109,7 @@ export async function fetchContributions(username: string, accessToken?: string)
   };
 }
 
-export async function fetchRepos(username: string, accessToken?: string) {
+export async function fetchRepos(username: string, accessToken: string) {
   const res = await fetch(GITHUB_GRAPHQL, {
     method: 'POST',
     headers: headers(accessToken),
@@ -134,7 +131,7 @@ export async function fetchRepos(username: string, accessToken?: string) {
   }));
 }
 
-export async function fetchReadme(owner: string, repo: string, accessToken?: string) {
+export async function fetchReadme(owner: string, repo: string, accessToken: string) {
   try {
     const res = await fetch(`${GITHUB_API}/repos/${owner}/${repo}/readme`, {
       headers: {

@@ -24,24 +24,28 @@ function handleAuthError(err: unknown, logout: () => void) {
 }
 
 export function GitHubProvider({ children }: { children: ReactNode }) {
-  const { logout } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
 
   const contribQuery = useQuery(
-    (signal) =>
-      http.get<GitHubContributions>('/github/contributions', { signal }).catch((err) => {
+    (signal) => {
+      if (!isAuthenticated) return Promise.resolve(null);
+      return http.get<GitHubContributions>('/github/contributions', { signal }).catch((err) => {
         handleAuthError(err, logout);
         throw err;
-      }),
-    [],
+      });
+    },
+    [isAuthenticated],
   );
 
   const reposQuery = useQuery(
-    (signal) =>
-      http.get<GitHubRepo[]>('/github/repos', { signal }).catch((err) => {
+    (signal) => {
+      if (!isAuthenticated) return Promise.resolve(null);
+      return http.get<GitHubRepo[]>('/github/repos', { signal }).catch((err) => {
         handleAuthError(err, logout);
         throw err;
-      }),
-    [],
+      });
+    },
+    [isAuthenticated],
   );
 
   const loadRepos = () => reposQuery.refetch();

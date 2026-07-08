@@ -78,6 +78,7 @@ export async function githubCallback(req: Request, res: Response) {
     const token = signUserJwt({
       userId: user._id.toString(),
       githubUsername: user.username,
+      githubToken: accessToken,
       role: 'user',
       hasToken: true,
     });
@@ -91,19 +92,19 @@ export async function githubCallback(req: Request, res: Response) {
 
 export async function getMe(req: AuthRequest, res: Response) {
   try {
-    const user = await User.findById(req.user?.userId).select('-__v -githubAccessToken');
+    const user = await User.findById(req.user?.userId).select('-__v');
     if (!user) {
       return res.status(404).json({ success: false, error: 'User not found' });
     }
     if (!user.isActive) {
       return res.status(403).json({ success: false, error: 'Account is blocked' });
     }
+    const userObj = user.toObject();
+    const hasToken = !!userObj.githubAccessToken;
+    delete (userObj as any).githubAccessToken;
     res.json({
       success: true,
-      data: {
-        ...user.toObject(),
-        hasToken: !!(await User.findById(user._id)?.select('githubAccessToken'))?.githubAccessToken,
-      },
+      data: { ...userObj, hasToken },
     });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
