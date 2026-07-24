@@ -1,35 +1,41 @@
-import { Request, Response } from 'express';
-import { env } from '../configs/env';
-import { User } from '../models/User';
-import { Portfolio } from '../models/Portfolio';
-import { signUserJwt } from '../utils/jwt';
-import { AuthRequest } from '../middlewares/auth';
+import { Request, Response } from "express";
+import { env } from "../configs/env";
+import { User } from "../models/User";
+import { Portfolio } from "../models/Portfolio";
+import { signUserJwt } from "../utils/jwt";
+import { AuthRequest } from "../middlewares/auth";
 
 export function redirectToGitHub(_req: Request, res: Response) {
   const params = new URLSearchParams({
-    client_id: env.GITHUB_CLIENT_ID,
+    client_id: env.AUTH_GITHUB_CLIENT_ID,
     redirect_uri: `${env.CLIENT_URL}/api/auth/github/callback`,
-    scope: 'read:user repo',
+    scope: "read:user repo",
   });
   res.redirect(`https://github.com/login/oauth/authorize?${params}`);
 }
 
 export async function githubCallback(req: Request, res: Response) {
   const { code } = req.query;
-  if (!code || typeof code !== 'string') {
+  if (!code || typeof code !== "string") {
     return res.redirect(`${env.CLIENT_URL}/login?error=missing_code`);
   }
 
   try {
-    const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({
-        client_id: env.GITHUB_CLIENT_ID,
-        client_secret: env.GITHUB_CLIENT_SECRET,
-        code,
-      }),
-    });
+    const tokenRes = await fetch(
+      "https://github.com/login/oauth/access_token",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          client_id: env.AUTH_GITHUB_CLIENT_ID,
+          client_secret: env.AUTH_GITHUB_CLIENT_SECRET,
+          code,
+        }),
+      },
+    );
 
     const tokenData: any = await tokenRes.json();
     if (tokenData.error) {
@@ -38,7 +44,7 @@ export async function githubCallback(req: Request, res: Response) {
 
     const accessToken = tokenData.access_token as string;
 
-    const userRes = await fetch('https://api.github.com/user', {
+    const userRes = await fetch("https://api.github.com/user", {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     const githubUser: any = await userRes.json();
@@ -52,8 +58,8 @@ export async function githubCallback(req: Request, res: Response) {
       user = await User.create({
         githubId: githubUser.id.toString(),
         username: githubUser.login,
-        avatarUrl: githubUser.avatar_url || '',
-        profileUrl: githubUser.html_url || '',
+        avatarUrl: githubUser.avatar_url || "",
+        profileUrl: githubUser.html_url || "",
         email: githubUser.email || null,
         githubAccessToken: accessToken,
         lastLoginAt: new Date(),
@@ -63,12 +69,12 @@ export async function githubCallback(req: Request, res: Response) {
         userId: user._id,
         personalInfo: {
           name: githubUser.name || githubUser.login,
-          title: '',
-          bio: '',
+          title: "",
+          bio: "",
           availableForHire: false,
-          email: githubUser.email || '',
-          linkedin: '',
-          github: githubUser.html_url || '',
+          email: githubUser.email || "",
+          linkedin: "",
+          github: githubUser.html_url || "",
         },
         skills: [],
         projects: [],
@@ -79,25 +85,27 @@ export async function githubCallback(req: Request, res: Response) {
       userId: user._id.toString(),
       githubUsername: user.username,
       githubToken: accessToken,
-      role: 'user',
+      role: "user",
       hasToken: true,
     });
 
     res.redirect(`${env.CLIENT_URL}/dashboard?token=${token}`);
   } catch (err: any) {
-    console.error('GitHub OAuth error:', err);
+    console.error("GitHub OAuth error:", err);
     res.redirect(`${env.CLIENT_URL}/admin?error=auth_failed`);
   }
 }
 
 export async function getMe(req: AuthRequest, res: Response) {
   try {
-    const user = await User.findById(req.user?.userId).select('-__v');
+    const user = await User.findById(req.user?.userId).select("-__v");
     if (!user) {
-      return res.status(404).json({ success: false, error: 'User not found' });
+      return res.status(404).json({ success: false, error: "User not found" });
     }
     if (!user.isActive) {
-      return res.status(403).json({ success: false, error: 'Account is blocked' });
+      return res
+        .status(403)
+        .json({ success: false, error: "Account is blocked" });
     }
     const userObj = user.toObject();
     const hasToken = !!userObj.githubAccessToken;

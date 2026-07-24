@@ -5,6 +5,7 @@ A full-stack terminal-themed portfolio platform with GitHub OAuth, MongoDB persi
 ## Tech Stack
 
 ### Frontend
+
 - **Framework**: React 18 + TypeScript + Vite
 - **Animation**: Framer Motion
 - **Icons**: Lucide React
@@ -13,6 +14,7 @@ A full-stack terminal-themed portfolio platform with GitHub OAuth, MongoDB persi
 - **HTTP**: Custom fetch interceptor with `useQuery`/`useMutation` hooks
 
 ### Backend
+
 - **Runtime**: Node.js + Express + TypeScript
 - **Database**: MongoDB + Mongoose
 - **Authentication**: JWT (user) + JWT (super admin), bcrypt
@@ -23,17 +25,20 @@ A full-stack terminal-themed portfolio platform with GitHub OAuth, MongoDB persi
 ## Features
 
 ### 1. Dynamic User Portfolios
+
 - Every portfolio lives at `/:username` (e.g. `/john-doe`)
 - Anyone can view any portfolio by typing the GitHub username
 - Legacy `/portfolio` route works as fallback
 
 ### 2. GitHub OAuth + JWT Auth
+
 - Sign in with GitHub to access the admin dashboard
 - JWT stored in `localStorage` (`auth-token`)
 - User model stores GitHub access token for proxied API calls
 - Automatic re-auth redirect when token expires
 
 ### 3. Admin Dashboard (`/admin`)
+
 - **Projects**: Full CRUD with title, slug, description, tags, tech stack, tools, cover image/video
 - **GitHub Repos**: Fetch repos from GitHub, toggle-select, import as projects
 - **Skills**: Add/remove skill chips
@@ -43,6 +48,7 @@ A full-stack terminal-themed portfolio platform with GitHub OAuth, MongoDB persi
 - Loading/disabled states on all form actions
 
 ### 4. Dynamic Username Routing
+
 - `/:username` → renders public portfolio
 - `/:username/project/:id` → renders project detail
 - Landing page detects auth state: logged-in users see their avatar/username + "View My Portfolio" link
@@ -51,17 +57,20 @@ A full-stack terminal-themed portfolio platform with GitHub OAuth, MongoDB persi
 ### 5. Project Detail Pages (`/:username/project/:id`)
 
 Each project displays:
+
 - Cover image or video (with play on hover for overlay title/description)
 - Tags, tech stack, tools (only rendered if non-empty)
 - GitHub README fetched via server-side proxy (only rendered if available)
 - "View Code" and "Live Demo" links
 
 ### 6. Project Cards
+
 - Full-width cover image/video when present
 - Hover overlay reveals title + description + tech stack
 - Fallback shows ID badge + title + description when no media
 
 ### 7. GitHub Contributions Board
+
 - Fetches via GitHub GraphQL API (proxied through server)
 - Stat cards: total contributions, commits, PRs, issues
 - Current streak and longest streak (with "days" suffix)
@@ -70,6 +79,7 @@ Each project displays:
 - Falls back to `GITHUB_TOKEN` env var for unauthenticated requests
 
 ### 8. Super Admin Panel (`/admin/super`)
+
 - Email/password login (bcrypt, JWT)
 - Dashboard with platform insights (users, projects, skills, themes)
 - User search, block/activate
@@ -77,21 +87,25 @@ Each project displays:
 - Public themes endpoint for frontend consumption
 
 ### 9. Multi-Theme System
+
 - All themes stored in MongoDB (super admin manages via CRUD)
 - Dynamic accent color applied across terminal UI
 - 10 default themes seeded (green, blue, purple, sky blue, zinc, amber, rose, cyan, emerald, orange)
 - No hardcoded theme fallbacks — DB is the single source of truth
 
 ### 10. Bilingual Support (i18n)
+
 - English and Arabic
 - Language toggle with RTL layout support
 - All UI text via `en.json` / `ar.json` translation files
 
 ### 11. README Rendering
+
 - Fetches README.md from GitHub repos via server proxy
 - Renders: headers, bold/italic, code blocks (syntax highlighted), images, links, task lists, blockquotes, tables, horizontal rules
 
 ### 12. Cloudinary Media Uploads
+
 - Drag-and-drop file picker in admin project form
 - Preview before upload (video with autoPlay/muted/loop, image thumbnail)
 - Validates file type (PNG, JPEG, GIF, MP4) and size (max 4MB) client-side
@@ -100,11 +114,13 @@ Each project displays:
 - Remove button to clear cover media
 
 ### 13. Header Bar
+
 - Fixed top bar with terminal branding (`~/portfolio`)
 - Shows avatar + username + Dashboard link + logout button when authenticated
 - Shows Login button when unauthenticated
 
 ### 14. Controls Panel
+
 - Floating settings button (bottom-right, `Ctrl+Space`)
 - Accent color picker (from available DB themes)
 - Language switcher (EN/AR)
@@ -112,6 +128,7 @@ Each project displays:
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - MongoDB instance
 - GitHub OAuth App (client ID + secret)
@@ -145,8 +162,8 @@ MONGODB_URI=mongodb://localhost:27017/portfolio
 JWT_SECRET=your-jwt-secret
 JWT_ADMIN_SECRET=your-admin-jwt-secret
 
-GITHUB_CLIENT_ID=your_github_oauth_client_id
-GITHUB_CLIENT_SECRET=your_github_oauth_client_secret
+AUTH_GITHUB_CLIENT_ID=your_github_oauth_client_id
+AUTH_GITHUB_CLIENT_SECRET=your_github_oauth_client_secret
 GITHUB_USERNAME=your_github_username
 GITHUB_TOKEN=your_github_personal_access_token
 
@@ -158,6 +175,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 ### Default Super Admin
+
 - Email: `admin@portfolio.com`
 - Password: `admin123`
 - Created via `npm run seed` in the server directory
@@ -240,40 +258,44 @@ CLOUDINARY_API_SECRET=your_api_secret
 ## API Endpoints
 
 ### Public
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/portfolio` | Default portfolio (optionally authenticated) |
-| GET | `/api/portfolio/:username` | Portfolio by GitHub username |
-| GET | `/api/portfolio/project/:id` | Project by ID from default portfolio |
-| GET | `/api/portfolio/:username/project/:projectId` | Project by username + project ID |
-| GET | `/api/github/contributions` | Contribution heatmap + streaks |
-| GET | `/api/github/readme/:owner/:repo` | Raw README content |
-| GET | `/api/themes` | Active themes |
+
+| Method | Path                                          | Description                                  |
+| ------ | --------------------------------------------- | -------------------------------------------- |
+| GET    | `/api/portfolio`                              | Default portfolio (optionally authenticated) |
+| GET    | `/api/portfolio/:username`                    | Portfolio by GitHub username                 |
+| GET    | `/api/portfolio/project/:id`                  | Project by ID from default portfolio         |
+| GET    | `/api/portfolio/:username/project/:projectId` | Project by username + project ID             |
+| GET    | `/api/github/contributions`                   | Contribution heatmap + streaks               |
+| GET    | `/api/github/readme/:owner/:repo`             | Raw README content                           |
+| GET    | `/api/themes`                                 | Active themes                                |
 
 ### Authenticated (user JWT)
-| Method | Path | Description |
-|--------|------|-------------|
-| PUT | `/api/portfolio` | Update portfolio |
-| POST | `/api/portfolio/reset` | Reset portfolio to defaults |
-| GET | `/api/github/repos` | User's GitHub repos |
-| POST | `/api/upload` | Upload file to Cloudinary |
+
+| Method | Path                   | Description                 |
+| ------ | ---------------------- | --------------------------- |
+| PUT    | `/api/portfolio`       | Update portfolio            |
+| POST   | `/api/portfolio/reset` | Reset portfolio to defaults |
+| GET    | `/api/github/repos`    | User's GitHub repos         |
+| POST   | `/api/upload`          | Upload file to Cloudinary   |
 
 ### Super Admin
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/admin/auth/login` | Email/password login |
-| GET | `/api/admin/insights` | Platform stats |
-| GET | `/api/admin/users` | Search users |
-| PATCH | `/api/admin/users/:id/block` | Block user |
-| PATCH | `/api/admin/users/:id/activate` | Activate user |
-| GET/POST/PUT/DELETE | `/api/admin/themes` | Theme CRUD |
+
+| Method              | Path                            | Description          |
+| ------------------- | ------------------------------- | -------------------- |
+| POST                | `/api/admin/auth/login`         | Email/password login |
+| GET                 | `/api/admin/insights`           | Platform stats       |
+| GET                 | `/api/admin/users`              | Search users         |
+| PATCH               | `/api/admin/users/:id/block`    | Block user           |
+| PATCH               | `/api/admin/users/:id/activate` | Activate user        |
+| GET/POST/PUT/DELETE | `/api/admin/themes`             | Theme CRUD           |
 
 ### Auth
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/auth/github` | GitHub OAuth redirect |
-| GET | `/api/auth/callback` | OAuth callback → JWT |
-| GET | `/api/auth/me` | Current user info |
+
+| Method | Path                 | Description           |
+| ------ | -------------------- | --------------------- |
+| GET    | `/api/auth/github`   | GitHub OAuth redirect |
+| GET    | `/api/auth/callback` | OAuth callback → JWT  |
+| GET    | `/api/auth/me`       | Current user info     |
 
 ## License
 
