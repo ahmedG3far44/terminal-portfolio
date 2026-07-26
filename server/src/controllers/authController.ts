@@ -8,7 +8,7 @@ import { AuthRequest } from "../middlewares/auth";
 export function redirectToGitHub(_req: Request, res: Response) {
   const params = new URLSearchParams({
     client_id: env.AUTH_GITHUB_CLIENT_ID,
-    redirect_uri: `${env.CLIENT_URL}/api/auth/github/callback`,
+    redirect_uri: `${env.SERVER_URL}/api/auth/github/callback`,
     scope: "read:user repo",
   });
   res.redirect(`https://github.com/login/oauth/authorize?${params}`);

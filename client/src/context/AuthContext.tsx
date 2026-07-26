@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { http } from '../services/http';
+import { http, API_BASE_URL } from '../services/http';
 import type { User } from '../types';
 
 interface AuthContextType {
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchUser]);
 
   const login = useCallback(() => {
-    window.location.href = '/api/auth/github';
+    window.location.href = `${API_BASE_URL}/auth/github`;
   }, []);
 
   const logout = useCallback(() => {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '../hooks/useQuery';
-import { http, HttpError } from '../services/http';
+import { http, HttpError, API_BASE_URL } from '../services/http';
 import ThemePreview from '../components/ThemePreview';
 import type { AdminInsights, User, Theme, PaginatedResponse } from '../types';
 
@@ -17,7 +17,7 @@ function getAdminToken(): string | null {
 
 function adminGet<T>(url: string) {
   const token = getAdminToken();
-  return fetch(`/api/admin${url}`, {
+  return fetch(`${API_BASE_URL}/admin${url}`, {
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
   }).then(async (res) => {
     const json = await res.json();
@@ -28,7 +28,7 @@ function adminGet<T>(url: string) {
 
 function adminPost(url: string, body?: any) {
   const token = getAdminToken();
-  return fetch(`/api/admin${url}`, {
+  return fetch(`${API_BASE_URL}/admin${url}`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,
@@ -41,7 +41,7 @@ function adminPost(url: string, body?: any) {
 
 function adminPatch(url: string) {
   const token = getAdminToken();
-  return fetch(`/api/admin${url}`, {
+  return fetch(`${API_BASE_URL}/admin${url}`, {
     method: 'PATCH',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
   }).then(async (res) => {
@@ -53,7 +53,7 @@ function adminPatch(url: string) {
 
 function adminDel(url: string) {
   const token = getAdminToken();
-  return fetch(`/api/admin${url}`, {
+  return fetch(`${API_BASE_URL}/admin${url}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
   }).then(async (res) => {
@@ -109,7 +109,7 @@ function UsersTab() {
       if (statusFilter !== 'all') params.set('status', statusFilter);
       params.set('page', page.toString());
       params.set('limit', '20');
-      return fetch(`/api/admin/users?${params}`, {
+      return fetch(`${API_BASE_URL}/admin/users?${params}`, {
         headers: { Authorization: `Bearer ${getAdminToken()}` },
       }).then(async (res) => {
         const json = await res.json();

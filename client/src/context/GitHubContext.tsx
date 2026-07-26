@@ -1,5 +1,5 @@
 import { createContext, useContext, type ReactNode } from 'react';
-import { http, HttpError } from '../services/http';
+import { http, HttpError, API_BASE_URL } from '../services/http';
 import { useQuery } from '../hooks/useQuery';
 import { useAuth } from './AuthContext';
 import type { GitHubContributions, GitHubRepo } from '../types';
@@ -19,7 +19,7 @@ const GitHubContext = createContext<GitHubContextType | null>(null);
 function handleAuthError(err: unknown, logout: () => void) {
   if (err instanceof HttpError && err.needsReauth) {
     logout();
-    window.location.href = '/api/auth/github';
+    window.location.href = `${API_BASE_URL}/auth/github`;
   }
 }
 

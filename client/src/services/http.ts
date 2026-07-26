@@ -1,5 +1,7 @@
-const BASE_URL =
+export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "/api";
+
+const BASE_URL = API_BASE_URL;
 
 interface HttpOptions {
   params?: Record<string, string | number | undefined>;

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Shield, Loader2 } from 'lucide-react';
+import { API_BASE_URL } from '../services/http';
 
 const COLORS = {
   background: '#09090b',
@@ -25,7 +26,7 @@ export default function SuperAdminLogin() {
     setError('');
 
     try {
-      const res = await fetch('/api/admin/auth/login', {
+      const res = await fetch(`${API_BASE_URL}/admin/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
