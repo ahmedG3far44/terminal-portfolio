@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import Landing from './pages/Landing';
 import Home from './pages/Home';
 import ProjectDetails from './pages/ProjectDetails';
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/admin" element={<ProtectedAdminRoute><SuperAdminDashboard /></ProtectedAdminRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <Analytics />
     </Router>
   );
 }
