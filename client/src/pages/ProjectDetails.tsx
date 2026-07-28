@@ -13,6 +13,8 @@ import Header from '../components/Header';
 import { ReadmeParser } from '../components/ReadmeParser';
 import type { Project } from '../types';
 
+const easeOutQuart: [number, number, number, number] = [0.25, 1, 0.5, 1];
+
 function extractRepoInfo(url: string): { owner: string; repo: string } | null {
   const match = url.match(/github\.com[\/:]([\w-]+)\/([\w-]+)/);
   if (match) return { owner: match[1], repo: match[2] };
@@ -26,6 +28,20 @@ export default function ProjectDetails() {
   const { getReadme } = useGitHub();
   const primary = colors?.primary || '#ec4899';
   const rgb = colors?.rgb || '57, 255, 20';
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightboxOpen(false);
+    };
+    window.addEventListener('keydown', handleKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      document.body.style.overflow = '';
+    };
+  }, [lightboxOpen]);
 
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
@@ -96,17 +112,27 @@ export default function ProjectDetails() {
       <div
         style={{
           minHeight: '100vh',
+          paddingTop: '52px',
           background: '#0d1117',
           color: primary,
           fontFamily: "'JetBrains Mono', monospace",
-          padding: '2rem',
+          position: 'relative',
         }}
       >
-        <Link to={username ? `/${username}` : '/portfolio'} style={{ color: primary, textDecoration: 'none' }}>
-          ← {t('nav.back')}
-        </Link>
-        <div style={{ marginTop: '2rem', fontStyle: 'italic', color: `rgba(${rgb}, 0.5)` }}>
-          <span style={{ animation: 'blink 1s infinite' }}>▋</span> Loading project...
+        <Header />
+        <div
+          style={{
+            maxWidth: '1120px',
+            margin: '0 auto',
+            padding: '6rem 2rem',
+          }}
+        >
+          <Link to={username ? `/${username}` : '/portfolio'} style={{ color: primary, textDecoration: 'none', fontSize: '0.875rem', opacity: 0.6 }}>
+            ← {t('nav.back')}
+          </Link>
+          <div style={{ marginTop: '2rem', color: `rgba(${rgb}, 0.5)`, fontSize: '0.75rem' }}>
+            <span style={{ animation: 'blink 1s infinite' }}>▋</span> Loading project...
+          </div>
         </div>
       </div>
     );
@@ -118,6 +144,15 @@ export default function ProjectDetails() {
 
   const projectTitle = project?.title || 'Project';
   const projectDesc = project?.description || 'Project details';
+
+  const chipStyle: React.CSSProperties = {
+    padding: '0.375rem 0.875rem',
+    border: `1px solid ${primary}40`,
+    borderRadius: '0.375rem',
+    fontSize: '0.75rem',
+    background: `rgba(${rgb}, 0.06)`,
+    color: `rgba(${rgb}, 0.75)`,
+  };
 
   return (
     <div
@@ -156,52 +191,58 @@ export default function ProjectDetails() {
           to={username ? `/${username}` : '/portfolio'}
           style={{
             display: 'inline-flex',
-            color: primary,
+            alignItems: 'center',
+            gap: '0.375rem',
+            color: `rgba(${rgb}, 0.5)`,
             textDecoration: 'none',
-            fontSize: '0.875rem',
-            opacity: 0.6,
-            marginBottom: '1rem',
+            fontSize: '0.75rem',
+            marginBottom: '2rem',
+            transition: 'color 0.2s ease',
           }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = primary; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = `rgba(${rgb}, 0.5)`; }}
         >
-          {isRTL ? '→ ' : '← '}
+          {isRTL ? '→' : '←'}
           {t('nav.back')}
         </Link>
+
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
+          initial={{ y: 16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.4, ease: easeOutQuart }}
           style={{
             marginBottom: '0.5rem',
-            color: `rgba(${rgb}, 0.5)`,
+            color: `rgba(${rgb}, 0.4)`,
             letterSpacing: '0.15em',
-            fontSize: '0.75rem',
+            fontSize: '0.7rem',
           }}
         >
           {`> cat ./${t('projects.title').toLowerCase()}/${project.slug}/info`}
         </motion.div>
 
         <motion.h1
-          initial={{ y: 20, opacity: 0 }}
+          initial={{ y: 16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.08, duration: 0.4, ease: easeOutQuart }}
           style={{
             fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
             fontWeight: 700,
-            margin: '1.5rem 0rem',
-            textShadow: `0 0 30px rgba(${rgb}, 0.3)`,
+            margin: '1.25rem 0 2rem',
+            lineHeight: 1.15,
           }}
         >
-          {project.title.toUpperCase()}
+          {project.title}
         </motion.h1>
 
         {project.tags.length > 0 && (
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
+            initial={{ y: 12, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.15 }}
+            transition={{ delay: 0.12, duration: 0.35, ease: easeOutQuart }}
             style={{
               display: 'flex',
-              gap: '0.75rem',
-              marginBottom: '1.5rem',
+              gap: '0.5rem',
+              marginBottom: '2rem',
               flexWrap: 'wrap',
             }}
           >
@@ -210,9 +251,11 @@ export default function ProjectDetails() {
                 key={tag}
                 style={{
                   padding: '0.25rem 0.75rem',
-                  border: `1px solid ${primary}`,
-                  fontSize: '0.7rem',
-                  background: `rgba(${rgb}, 0.1)`,
+                  border: `1px solid ${primary}50`,
+                  borderRadius: '9999px',
+                  fontSize: '0.65rem',
+                  background: `rgba(${rgb}, 0.08)`,
+                  color: `rgba(${rgb}, 0.7)`,
                 }}
               >
                 {tag}
@@ -223,51 +266,62 @@ export default function ProjectDetails() {
 
         {project.coverImage && (
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
+            initial={{ y: 16, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.18 }}
-            style={{ marginBottom: '1.5rem' }}
+            transition={{ delay: 0.16, duration: 0.4, ease: easeOutQuart }}
+            style={{
+              marginBottom: '2.5rem',
+              borderRadius: '0.75rem',
+              overflow: 'hidden',
+              background: '#000',
+              cursor: /\.mp4$/i.test(project.coverImage ?? '') ? 'default' : 'pointer',
+            }}
+            onClick={() => {
+              if (!/\.mp4$/i.test(project.coverImage ?? '')) setLightboxOpen(true);
+            }}
           >
-            {/\.mp4$/i.test(project.coverImage) ? (
+            {/\.mp4$/i.test(project.coverImage ?? '') ? (
               <video
-                src={project.coverImage}
+                src={project.coverImage ?? ''}
                 muted
                 loop
                 autoPlay
-                style={{ width: '100%', maxHeight: '400px', borderRadius: '0.5rem', objectFit: 'cover' }}
+                playsInline
+                style={{ width: '100%', maxHeight: '480px', objectFit: 'contain', display: 'block' }}
               />
             ) : (
               <img
-                src={project.coverImage}
+                src={project.coverImage ?? ''}
                 alt={project.title}
-                style={{ width: '100%', maxHeight: '400px', borderRadius: '0.5rem', objectFit: 'cover' }}
+                style={{ width: '100%', maxHeight: '480px', objectFit: 'contain', display: 'block' }}
               />
             )}
           </motion.div>
         )}
 
         <motion.p
-          initial={{ y: 20, opacity: 0 }}
+          initial={{ y: 12, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.2, duration: 0.35, ease: easeOutQuart }}
           style={{
-            fontSize: '0.75rem',
-            lineHeight: 1.5,
-            color: `rgba(${rgb}, 0.8)`,
-            marginBottom: '2rem',
+            fontSize: '0.8125rem',
+            lineHeight: 1.7,
+            color: `rgba(${rgb}, 0.75)`,
+            marginBottom: '2.5rem',
+            maxWidth: '65ch',
           }}
         >
           {project.description}
         </motion.p>
 
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
+          initial={{ y: 12, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.25 }}
+          transition={{ delay: 0.24, duration: 0.35, ease: easeOutQuart }}
           style={{
             display: 'flex',
-            gap: '1rem',
-            marginBottom: '3rem',
+            gap: '0.75rem',
+            marginBottom: '3.5rem',
             flexWrap: 'wrap',
           }}
         >
@@ -277,16 +331,20 @@ export default function ProjectDetails() {
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                padding: '0.75rem 1.5rem',
+                padding: '0.625rem 1.25rem',
                 background: primary,
                 color: '#0d1117',
                 textDecoration: 'none',
-                fontSize: '0.875rem',
+                fontSize: '0.8125rem',
                 fontWeight: 600,
+                borderRadius: '0.5rem',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.5rem',
+                transition: 'opacity 0.2s ease',
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
             >
               <GitBranch size={16} />
               {t('projects.viewCode')}
@@ -298,47 +356,45 @@ export default function ProjectDetails() {
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                padding: '0.75rem 1.5rem',
-                border: `1px solid ${primary}`,
-                color: primary,
+                padding: '0.625rem 1.25rem',
+                border: `1px solid ${primary}50`,
+                borderRadius: '0.5rem',
+                color: `rgba(${rgb}, 0.8)`,
                 textDecoration: 'none',
-                fontSize: '0.875rem',
-                fontWeight: 600,
+                fontSize: '0.8125rem',
+                fontWeight: 500,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.375rem',
+                transition: 'border-color 0.2s ease, color 0.2s ease',
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = primary; e.currentTarget.style.color = primary; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = `${primary}50`; e.currentTarget.style.color = `rgba(${rgb}, 0.8)`; }}
             >
-              {t('projects.liveDemo')} →
+              {t('projects.liveDemo')}
+              <span style={{ fontSize: '1.1em', lineHeight: 1 }}>→</span>
             </a>
           )}
         </motion.div>
 
         {project.techStack.length > 0 && (
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
+            initial={{ y: 12, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            style={{ marginBottom: '2rem' }}
+            transition={{ delay: 0.28, duration: 0.35, ease: easeOutQuart }}
+            style={{ marginBottom: project.tools.length > 0 ? '2rem' : '3.5rem' }}
           >
             <h3
               style={{
-                fontSize: '0.75rem',
-                color: `rgba(${rgb}, 0.5)`,
+                fontSize: '0.7rem',
+                color: `rgba(${rgb}, 0.4)`,
                 marginBottom: '1rem',
                 letterSpacing: '0.15em',
               }}
             >{`> ${t('projects.techStack')}`}</h3>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {project.techStack.map((tech: string) => (
-                <span
-                  key={tech}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    border: `1px solid ${primary}50`,
-                    fontSize: '0.8rem',
-                    background: `rgba(${rgb}, 0.05)`,
-                  }}
-                >
-                  {tech}
-                </span>
+                <span key={tech} style={chipStyle}>{tech}</span>
               ))}
             </div>
           </motion.div>
@@ -346,31 +402,22 @@ export default function ProjectDetails() {
 
         {project.tools.length > 0 && (
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
+            initial={{ y: 12, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.35 }}
-            style={{ marginBottom: '3rem' }}
+            transition={{ delay: 0.32, duration: 0.35, ease: easeOutQuart }}
+            style={{ marginBottom: '3.5rem' }}
           >
             <h3
               style={{
-                fontSize: '0.75rem',
-                color: `rgba(${rgb}, 0.5)`,
+                fontSize: '0.7rem',
+                color: `rgba(${rgb}, 0.4)`,
                 marginBottom: '1rem',
                 letterSpacing: '0.15em',
               }}
             >{`> ${t('projects.tools')}`}</h3>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {project.tools.map((tool: string) => (
-                <span
-                  key={tool}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    fontSize: '0.8rem',
-                    color: `rgba(${rgb}, 0.6)`,
-                  }}
-                >
-                  {tool}
-                </span>
+                <span key={tool} style={chipStyle}>{tool}</span>
               ))}
             </div>
           </motion.div>
@@ -378,30 +425,31 @@ export default function ProjectDetails() {
 
         {(readmeLoading || readme) && (
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
+            initial={{ y: 12, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            style={{ marginTop: '3rem' }}
+            transition={{ delay: 0.36, duration: 0.35, ease: easeOutQuart }}
+            style={{ marginTop: '1rem' }}
           >
             <h3
               style={{
-                fontSize: '0.75rem',
-                color: `rgba(${rgb}, 0.5)`,
-                marginBottom: '1.5rem',
+                fontSize: '0.7rem',
+                color: `rgba(${rgb}, 0.4)`,
+                marginBottom: '1.25rem',
                 letterSpacing: '0.15em',
               }}
             >{`> cat README.md`}</h3>
 
             {readmeLoading ? (
-              <div style={{ color: `rgba(${rgb}, 0.5)`, fontStyle: 'italic' }}>
+              <div style={{ color: `rgba(${rgb}, 0.4)`, fontSize: '0.75rem' }}>
                 <span style={{ animation: 'blink 1s infinite' }}>▋</span> Loading README...
               </div>
             ) : (
               <div
                 style={{
                   padding: '1.5rem',
-                  border: `1px solid ${primary}20`,
-                  background: `rgba(${rgb}, 0.02)`,
+                  border: `1px solid ${primary}15`,
+                  borderRadius: '0.5rem',
+                  background: `rgba(${rgb}, 0.03)`,
                   maxHeight: '600px',
                   overflowY: 'auto',
                 }}
@@ -415,6 +463,41 @@ export default function ProjectDetails() {
           </motion.div>
         )}
       </motion.div>
+
+      {lightboxOpen && project?.coverImage && !/\.mp4$/i.test(project.coverImage ?? '') && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+          onClick={() => setLightboxOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            background: 'rgba(0, 0, 0, 0.92)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'zoom-out',
+            padding: '2rem',
+          }}
+        >
+          <motion.img
+            initial={{ scale: 0.92 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.25, ease: easeOutQuart }}
+            src={project.coverImage ?? ''}
+            alt={project.title}
+            style={{
+              maxWidth: '100%',
+              maxHeight: '100%',
+              objectFit: 'contain',
+              display: 'block',
+              borderRadius: '0.5rem',
+            }}
+          />
+        </motion.div>
+      )}
 
       <style>{`
         @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }

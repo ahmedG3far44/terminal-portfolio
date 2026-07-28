@@ -321,6 +321,7 @@ function ThemeContent() {
                 textDecoration: 'none',
                 color: 'inherit',
                 display: 'flex',
+                flex: 1,
               }}
             >
               <motion.div
@@ -335,11 +336,12 @@ function ThemeContent() {
                 style={{
                   ...sectionStyles.projectCard,
                   border: `1px solid ${primary}30`,
+                  flex: 1,
                   ...(project.coverImage ? { padding: 0 } : {}),
                 } as React.CSSProperties}
               >
                 {project.coverImage ? (
-                  <div style={{ position: 'relative', width: '100%', height:'100%' , overflow: 'hidden' }}>
+                  <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', flex: 1 }}>
                     {/\.mp4$/i.test(project.coverImage) ? (
                       <video
                         src={project.coverImage}
@@ -377,22 +379,21 @@ function ThemeContent() {
                     </div>
                   </div>
                 ) : (
-                  <>
-                    <div style={{ fontSize: '3rem', fontWeight: 700, color: `rgba(${rgb}, 0.2)`, marginBottom: '1rem' }}>
-                      {project.id || project._id?.slice(-2) || i + 1}
+                  <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <h3 style={{ ...sectionStyles.projectCardTitle, color: primary } as React.CSSProperties}>
+                        {project.title}
+                      </h3>
+                      <p style={{ ...sectionStyles.projectCardDescription, color: `rgba(${rgb}, 0.7)`, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', flex: 1 } as React.CSSProperties}>
+                        {project.description}
+                      </p>
                     </div>
-                    <h3 style={{ ...sectionStyles.projectCardTitle, color: primary, marginBottom: '0.5rem' } as React.CSSProperties}>
-                      {project.title}
-                    </h3>
-                    <p style={{ ...sectionStyles.projectCardDescription, color: `rgba(${rgb}, 0.6)`, fontSize: '0.875rem' } as React.CSSProperties}>
-                      {project.description}
-                    </p>
                     {project.techStack.length > 0 && (
                       <span style={{ ...sectionStyles.projectCardTechStack, color: `rgba(${rgb}, 0.5)` } as React.CSSProperties}>
                         {'>'} {project.techStack.join(', ')}
                       </span>
                     )}
-                  </>
+                  </div>
                 )}
               </motion.div>
             </Link>
