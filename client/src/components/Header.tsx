@@ -1,13 +1,34 @@
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { LogIn, LayoutDashboard, LogOut, User } from 'lucide-react';
+import Logo from './Logo';
 
 export default function Header() {
   const { isAuthenticated, user, loading, login, logout } = useAuth();
   const { colors } = useTheme();
   const primary = colors?.primary || '#ec4899';
   const rgb = colors?.rgb || '57, 255, 20';
+  const [visible, setVisible] = useState(true);
+  const prevScroll = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const current = window.scrollY;
+      const delta = current - prevScroll.current;
+      if (current < 20) {
+        setVisible(true);
+      } else if (delta > 5) {
+        setVisible(false);
+      } else if (delta < -5) {
+        setVisible(true);
+      }
+      prevScroll.current = current;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <header
@@ -17,31 +38,25 @@ export default function Header() {
         left: 0,
         right: 0,
         zIndex: 999,
-        background: 'rgba(9, 9, 11, 0.85)',
-        backdropFilter: 'blur(8px)',
+        background: 'rgba(9, 9, 11, 0.4)',
+        backdropFilter: 'blur(12px)',
         borderBottom: `1px solid ${primary}20`,
-        padding: '0.625rem 1.5rem',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
         fontFamily: "'JetBrains Mono', monospace",
+        transform: visible ? 'translateY(0)' : 'translateY(-100%)',
+        transition: 'transform 0.3s ease',
       }}
     >
-      <Link
-        to="/"
+      <div
         style={{
-          color: primary,
-          textDecoration: 'none',
-          fontSize: '0.875rem',
-          fontWeight: 600,
+          maxWidth: '1120px',
+          margin: '0 auto',
+          padding: '0.625rem 2rem',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.5rem',
+          justifyContent: 'space-between',
         }}
       >
-        <img width={40} height={40} src='/icon.svg' alt='' />
-        <span className="text-3xl font-black">Tolio</span>
-      </Link>
+      <Logo color={primary} />
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
         {loading ? (
@@ -129,6 +144,7 @@ export default function Header() {
             Login
           </button>
         )}
+      </div>
       </div>
     </header>
   );

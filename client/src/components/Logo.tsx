@@ -1,16 +1,26 @@
-import { Link } from "react-router-dom"
+import { Link } from 'react-router-dom';
 
-const Logo = () => {
-  return (
-    <Link to={"/"} className='hover:scale-95 duration-300 flex items-center justify-start gap-2'>
-        <div className="w-12 h-12 rounded-2xl overflow-hidden">
-            <img className="object-cover w-full h-full" src="/icon.svg" alt="" />
-        </div>
-        <h1 className="text-2xl font-bold">
-            Tolio
-        </h1>
-    </Link>
-  )
+interface LogoProps {
+  color?: string;
+  onClick?: () => void;
 }
 
-export default Logo
+export default function Logo({ color, onClick }: LogoProps) {
+  return (
+    <Link
+      to="/"
+      onClick={onClick}
+      style={{
+        color: color || 'inherit',
+        textDecoration: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        fontWeight: 700,
+      }}
+    >
+      <img width={40} height={40} src='/icon.svg' alt='' />
+          <span style={{ fontSize: '1.1rem' }}>Portfolio</span>
+    </Link>
+  );
+}

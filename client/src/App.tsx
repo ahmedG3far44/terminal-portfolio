@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
+import { HelmetProvider } from 'react-helmet-async';
 import Landing from './pages/Landing';
 import Home from './pages/Home';
 import ProjectDetails from './pages/ProjectDetails';
@@ -12,6 +13,7 @@ import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
 export default function App() {
   return (
+    <HelmetProvider>
     <Router>
       <Routes>
         <Route path="/" element={<Landing />} />
@@ -27,5 +29,6 @@ export default function App() {
       </Routes>
       <Analytics />
     </Router>
+    </HelmetProvider>
   );
 }

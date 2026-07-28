@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { Wrench, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -42,6 +43,11 @@ export default function LoginPage() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: COLORS.background, padding: '1rem' }}>
+      <Helmet>
+        <title>Login — Portfolio</title>
+        <meta name="description" content="Sign in to manage your portfolio dashboard." />
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ background: COLORS.card, padding: '2rem', borderRadius: '0.75rem', width: '100%', maxWidth: '360px', border: `1px solid ${COLORS.border}` }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div style={{ width: '48px', height: '48px', borderRadius: '0.75rem', background: COLORS.muted, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}><Wrench size={24} /></div>

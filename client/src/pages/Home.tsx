@@ -12,6 +12,7 @@ import type { Portfolio, Contact } from '../types';
 import Controls from '../components/Controls';
 import Header from '../components/Header';
 import { getContactIcon } from '../components/ContactIcons';
+import { Helmet } from 'react-helmet-async';
 
 const GitHubBoard = lazy(() => import('../components/GitHubBoard'));
 
@@ -102,6 +103,13 @@ function ThemeContent() {
     name: '', title: '', bio: '', availableForHire: false,
   };
 
+  const pageTitle = personalInfo.name
+    ? `${personalInfo.name} — Portfolio`
+    : 'Portfolio';
+  const pageDesc = personalInfo.bio
+    ? personalInfo.bio
+    : 'Developer portfolio built with the terminal-themed portfolio platform.';
+
   return (
     <div
       style={{
@@ -111,6 +119,15 @@ function ThemeContent() {
         fontFamily: sectionStyles.pageBackground?.fontFamily || "'JetBrains Mono', 'Fira Code', monospace",
       }}
     >
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDesc} />
+        <meta name="keywords" content={`portfolio, ${personalInfo.name}, developer, ${skills.join(', ')}`} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDesc} />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDesc} />
+      </Helmet>
       <Header />
       <Controls />
 

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Home } from 'lucide-react';
@@ -28,6 +29,11 @@ export default function NotFoundPage() {
         direction: isRTL ? 'rtl' : 'ltr',
       }}
     >
+      <Helmet>
+        <title>404 — Page Not Found</title>
+        <meta name="description" content="The page you are looking for does not exist or has been moved." />
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <div
         style={{
           position: 'fixed',

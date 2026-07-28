@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Shield, Loader2 } from 'lucide-react';
 import { API_BASE_URL } from '../services/http';
@@ -45,6 +46,11 @@ export default function SuperAdminLogin() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: COLORS.background, padding: '1rem' }}>
+      <Helmet>
+        <title>Super Admin Login — Portfolio</title>
+        <meta name="description" content="Super admin sign in for platform management." />
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

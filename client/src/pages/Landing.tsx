@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Terminal, GitBranch, LayoutDashboard, Shield, Palette, Globe, Database, Code2, LogIn, User, Loader2, ArrowRight } from 'lucide-react';
 import TerminalWidget from '../components/TerminalWidget';
+import Logo from '../components/Logo';
 
 const easeOut = [0.25, 1, 0.5, 1];
 
@@ -198,6 +200,13 @@ export default function Landing() {
 
   return (
     <div style={{ minHeight: '100dvh', background: tokens.bg, fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif" }}>
+      <Helmet>
+        <title>Portfolio — Terminal-Themed Portfolio CMS</title>
+        <meta name="description" content="A terminal-themed portfolio platform with GitHub OAuth, MongoDB persistence, super admin management, and live GitHub integration. Built with TypeScript and React." />
+        <meta name="keywords" content="portfolio, terminal, developer portfolio, GitHub CMS, React, TypeScript" />
+        <meta property="og:title" content="Portfolio — Terminal-Themed Portfolio CMS" />
+        <meta property="og:description" content="A terminal-themed portfolio platform with GitHub OAuth, MongoDB persistence, super admin management, and live GitHub integration." />
+      </Helmet>
       <div
         style={{
           position: 'fixed',
@@ -215,19 +224,21 @@ export default function Landing() {
         style={{
           position: 'relative',
           zIndex: 1,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '1.25rem 2rem',
           borderBottom: `1px solid ${tokens.borderBase}`,
         }}
       >
-        <motion.div
-          whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: tokens.accent, fontWeight: 700, fontSize: '1.1rem' }}
+        <div
+          style={{
+            maxWidth: '1120px',
+            margin: '0 auto',
+            padding: '1.25rem 2rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
         >
-          <Terminal size={22} />
-          <span>terminal-portfolio</span>
+        <motion.div whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}>
+          <Logo color={tokens.accent} />
         </motion.div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           {authLoading ? (
@@ -278,6 +289,7 @@ export default function Landing() {
               Super Admin
             </Link>
           )}
+        </div>
         </div>
       </motion.nav>
 
@@ -520,14 +532,34 @@ export default function Landing() {
         style={{
           position: 'relative',
           zIndex: 1,
-          textAlign: 'center',
-          padding: '2rem',
           borderTop: `1px solid ${tokens.borderBase}`,
           color: tokens.textDim,
           fontSize: '0.8rem',
         }}
       >
-        Built with TypeScript and React &middot; {new Date().getFullYear()}
+        <div
+          style={{
+            maxWidth: '1120px',
+            margin: '0 auto',
+            padding: '2rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <span>Built with TypeScript and React &middot; {new Date().getFullYear()}</span>
+          <span>
+            Developed by{' '}
+            <a
+              href="https://www.linkedin.com/in/ahmedG3far44"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: tokens.accent, textDecoration: 'none' }}
+            >
+              @ahmedG3far44
+            </a>
+          </span>
+        </div>
       </motion.footer>
 
       <style>{`

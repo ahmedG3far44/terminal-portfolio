@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import NotFoundPage from './NotFoundPage';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -115,6 +116,9 @@ export default function ProjectDetails() {
     return <NotFoundPage />;
   }
 
+  const projectTitle = project?.title || 'Project';
+  const projectDesc = project?.description || 'Project details';
+
   return (
     <div
       style={{
@@ -126,35 +130,42 @@ export default function ProjectDetails() {
         position: 'relative',
       }}
     >
+      <Helmet>
+        <title>{projectTitle} — Project Details</title>
+        <meta name="description" content={projectDesc} />
+        <meta name="keywords" content={`${projectTitle}, project, portfolio, ${project?.techStack?.join(', ') || ''}`} />
+        <meta property="og:title" content={`${projectTitle} — Project Details`} />
+        <meta property="og:description" content={projectDesc} />
+        {project?.coverImage && <meta property="og:image" content={project.coverImage} />}
+        <meta name="twitter:title" content={`${projectTitle} — Project Details`} />
+        <meta name="twitter:description" content={projectDesc} />
+      </Helmet>
       <Header />
       <Controls />
-
-      <Link
-        to={username ? `/${username}` : '/portfolio'}
-        style={{
-          position: 'fixed',
-          top: 'calc(52px + 0.75rem)',
-          [isRTL ? 'right' : 'left']: '1.5rem',
-          color: primary,
-          textDecoration: 'none',
-          fontSize: '0.875rem',
-          opacity: 0.6,
-          zIndex: 100,
-        }}
-      >
-        {isRTL ? '→ ' : '← '}
-        {t('nav.back')}
-      </Link>
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         style={{
-          maxWidth: '900px',
+          maxWidth: '1120px',
           margin: '0 auto',
           padding: '6rem 2rem 4rem',
         }}
       >
+        <Link
+          to={username ? `/${username}` : '/portfolio'}
+          style={{
+            display: 'inline-flex',
+            color: primary,
+            textDecoration: 'none',
+            fontSize: '0.875rem',
+            opacity: 0.6,
+            marginBottom: '1rem',
+          }}
+        >
+          {isRTL ? '→ ' : '← '}
+          {t('nav.back')}
+        </Link>
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

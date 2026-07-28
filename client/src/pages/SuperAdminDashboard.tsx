@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useQuery } from '../hooks/useQuery';
 import { http, HttpError, API_BASE_URL } from '../services/http';
 import ThemePreview from '../components/ThemePreview';
@@ -363,6 +364,11 @@ export default function SuperAdminDashboard() {
 
   return (
     <div style={{ minHeight: '100vh', background: COLORS.background, padding: '2rem' }}>
+      <Helmet>
+        <title>Super Admin Dashboard — Portfolio</title>
+        <meta name="description" content="Platform-wide management dashboard for super administrators." />
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <h1 style={{ color: COLORS.foreground, fontSize: '1.5rem' }}>Super Admin Dashboard</h1>

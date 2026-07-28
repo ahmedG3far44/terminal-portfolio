@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
 import { useAuth } from '../context/AuthContext';
@@ -219,13 +220,13 @@ function CoverImageUpload({
               muted
               loop
               autoPlay
-              style={{ width: '100%', maxHeight: '240px', borderRadius: '0.5rem', objectFit: 'cover' }}
+              style={{ width: '100%', maxHeight: '400px', borderRadius: '0.5rem', objectFit: 'contain', background: '#000' }}
             />
           ) : (
             <img
               src={previewUrl}
               alt="Preview"
-              style={{ width: '100%', maxHeight: '240px', borderRadius: '0.5rem', objectFit: 'cover' }}
+              style={{ width: '100%', maxHeight: '400px', borderRadius: '0.5rem', objectFit: 'contain', background: '#000' }}
             />
           )}
         </div>
@@ -481,6 +482,11 @@ function AdminContent() {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: COLORS.background }}>
+      <Helmet>
+        <title>Dashboard — Portfolio</title>
+        <meta name="description" content="Manage your portfolio projects, skills, and personal information." />
+        <meta name="robots" content="noindex" />
+      </Helmet>
       {!isMobile && (
         <div style={{ width: SIDEBAR_WIDTH, height: '100vh', background: COLORS.card, borderRight: `1px solid ${COLORS.border}`, position: 'fixed', left: 0, top: 0, zIndex: 40 }}>
           <SidebarContent activeTab={activeTab} setActiveTab={setActiveTab} />
